@@ -215,5 +215,5 @@ pip-log.txt
 .mr.developer.cfg
 
 #svn update
-.svn\
+.svn/
 *.svn-base
