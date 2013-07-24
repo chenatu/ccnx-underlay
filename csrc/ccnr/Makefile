@@ -1,0 +1,1 @@
+link ..//ccnr/../generic.mk
