@@ -50,7 +50,7 @@ TryScript "local" "$@"
 # Save these as COPT in conf.mk
 UNAME=$(uname)
 FREEBSD="FreeBSD"
-ifeq($(UNAME),$(FREEBSD))
+ifeq("$(UNAME)",$(FREEBSD))
 DEFOS="-DFreeBSD"
 endif
 echo COPT = ${CFLAGS:="-g"}  $DEFOS>> conf.mk
