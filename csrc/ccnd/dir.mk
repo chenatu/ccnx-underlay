@@ -36,7 +36,7 @@ CCND_OBJ = ccnd_main.o ccnd.o ccnd_msg.o ccnd_stats.o ccnd_internal_client.o
 ccnd: $(CCND_OBJ) ccnd_built.sh
 	$(CC) $(CFLAGS) -g -o $@ $(CCND_OBJ) $(LDLIBS) $(OPENSSL_LIBS) -lcrypto
 	sh ./ccnd_built.sh
-
+	@echo CFLAGS:$(CFLAGS)
 ccnd_built.sh:
 	touch ccnd_built.sh
 
