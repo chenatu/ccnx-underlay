@@ -30,14 +30,15 @@ default all clean depend coverage test check shared install uninstall config_sub
 	for i in $(SUBDIRS); do         \
 	  (cd "$$i" && pwd && $(MAKE) $(MAKEF) "COPT=$(CFLAGS)" CFLAGS='$$(REAL_CFLAGS)' SRCDIR=../$(SRCDIR)/$$i $@) || exit 1;	\
 	done
-	@test -d $(OBJTREE) && echo "+++ NOTE - $(OBJTREE) exists" ||:
-	@rm -f _always
 	UNAME := $(shell uname)
+	echo "before ifreq"
 	ifeq($(UNAME),FreeBSD)
 	DEFOS="FreeBSD"
 	CFLAGS += -D $DEFOS
 	endif
 	echo CFLAGS:$CFLAGS
+	@test -d $(OBJTREE) && echo "+++ NOTE - $(OBJTREE) exists" ||:
+	@rm -f _always
 
 subr.mk generic.mk:
 	test -f ./$(SRCDIR)/$@ && ln -s ./$(SRCDIR)/$@
