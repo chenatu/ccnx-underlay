@@ -37,6 +37,7 @@ default all clean depend coverage test check shared install uninstall config_sub
 	DEFOS="FreeBSD"
 	CFLAGS += -D $DEFOS
 	endif
+	echo CFLAGS:$CFLAGS
 
 subr.mk generic.mk:
 	test -f ./$(SRCDIR)/$@ && ln -s ./$(SRCDIR)/$@
