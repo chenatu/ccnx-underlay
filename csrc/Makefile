@@ -15,6 +15,13 @@
 SUBDIRS = lib ccnd sync ccnr libexec cmd util tests exttests
 OBJTREE = build
 MAKEF =  -f ../conf.mk -f dir.mk -f ../subr.mk
+UNAME=`uname`
+	echo "before ifreq"
+	ifeq($(UNAME),FreeBSD)
+	DEFOS="FreeBSD"
+	COPT="$COPT -D$DEFOS"
+	endif
+	echo CFLAGS:$CFLAGS
 CFLAGS = $(COPT)
 
 
@@ -30,13 +37,6 @@ default all clean depend coverage test check shared install uninstall config_sub
 	for i in $(SUBDIRS); do         \
 	  (cd "$$i" && pwd && $(MAKE) $(MAKEF) "COPT=$(CFLAGS)" CFLAGS='$$(REAL_CFLAGS)' SRCDIR=../$(SRCDIR)/$$i $@) || exit 1;	\
 	done
-	UNAME=`uname`
-	echo "before ifreq"
-	ifeq($(UNAME),FreeBSD)
-	DEFOS="FreeBSD"
-	CFLAGS="$CFLAGS -D$DEFOS"
-	endif
-	echo CFLAGS:$CFLAGS
 	@test -d $(OBJTREE) && echo "+++ NOTE - $(OBJTREE) exists" ||:
 	@rm -f _always
 
