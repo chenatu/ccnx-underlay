@@ -17,11 +17,6 @@ OBJTREE = build
 MAKEF =  -f ../conf.mk -f dir.mk -f ../subr.mk
 CFLAGS = $(COPT)
 
-UNAME:=$(shell uname)
-ifeq($(UNAME),FreeBSD)
-DEFOS="FreeBSD"
-CFLAGS += -D $DEFOS
-endif
 
 default:
 
@@ -37,6 +32,11 @@ default all clean depend coverage test check shared install uninstall config_sub
 	done
 	@test -d $(OBJTREE) && echo "+++ NOTE - $(OBJTREE) exists" ||:
 	@rm -f _always
+	UNAME := $(shell uname)
+	ifeq($(UNAME),FreeBSD)
+	DEFOS="FreeBSD"
+	CFLAGS += -D $DEFOS
+	endif
 
 subr.mk generic.mk:
 	test -f ./$(SRCDIR)/$@ && ln -s ./$(SRCDIR)/$@
