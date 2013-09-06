@@ -21,9 +21,9 @@ ifeq($(UNAME),FreeBSD)
 DEFOS := "FreeBSD"
 COPT := "$COPT -D$DEFOS"
 endif
-echo "CFLAGS:$CFLAGS"
+@echo "CFLAGS:$CFLAGS"
 CFLAGS = $(COPT)
-echo "CFLAGS"
+@echo "CFLAGS"
 
 default:
 
