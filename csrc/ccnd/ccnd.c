@@ -6283,7 +6283,7 @@ int get_iface_index(int fd, const char* interface_name)
     {
         return (-1);
     }
-#if defined(FreeBSD)
+#ifdef FreeBSD
 	return ifr.ifr_index;
 #else
     return ifr.ifr_ifindex;
