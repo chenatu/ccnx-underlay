@@ -15,15 +15,12 @@
 SUBDIRS = lib ccnd sync ccnr libexec cmd util tests exttests
 OBJTREE = build
 MAKEF =  -f ../conf.mk -f dir.mk -f ../subr.mk
-UNAME :=`uname`
-@echo "before ifreq"
-ifeq($(UNAME),FreeBSD)
+UNAME := $(shell uname)
+ifeq ($(UNAME), FreeBSD)
 DEFOS := "FreeBSD"
 COPT := "$COPT -D$DEFOS"
 endif
-@echo "CFLAGS:$CFLAGS"
 CFLAGS = $(COPT)
-@echo "CFLAGS"
 
 default:
 
