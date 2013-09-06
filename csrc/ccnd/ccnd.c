@@ -5756,7 +5756,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				raw_addr->sll_halen = 6;
 				raw_addr->sll_pkttype = PACKET_OUTGOING;
 				int eth = -1;
-				if (strcmp(usock_list->usock.eth, "eth0") == 0)
+				/*if (strcmp(usock_list->usock.eth, "eth0") == 0)
 				{		
 					eth = 0;
 				}	else if (strcmp(usock_list->usock.eth, "eth1") == 0){
@@ -5775,8 +5775,8 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					eth = 7;
 				}	else if (strcmp(usock_list->usock.eth, "eth8") == 0){
 					eth = 8;
-				}
-				int u = set_promisc(h, raw_fd, eth);
+				}*/
+				int u = set_promisc(h, raw_fd, raw_addr->sll_ifindex);
 				res = fcntl(fd, F_SETFL, O_NONBLOCK);
 	   			if (res == -1)
 	        		ccnd_msg(h, "fcntl: %s", strerror(errno));
@@ -6283,7 +6283,11 @@ int get_iface_index(int fd, const char* interface_name)
     {
         return (-1);
     }
+#if defined(FREEBSD)
+	return ifr.ifr_index;
+#else
     return ifr.ifr_ifindex;
+#endif
 }
 
 int set_promisc(struct ccnd_handle *h, int f, int n){
