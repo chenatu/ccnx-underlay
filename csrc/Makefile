@@ -15,6 +15,7 @@
 SUBDIRS = lib ccnd sync ccnr libexec cmd util tests exttests
 OBJTREE = build
 MAKEF =  -f ../conf.mk -f dir.mk -f ../subr.mk
+CFLAGS = $(COPT)
 
 default:
 
