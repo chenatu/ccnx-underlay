@@ -17,6 +17,12 @@ OBJTREE = build
 MAKEF =  -f ../conf.mk -f dir.mk -f ../subr.mk
 CFLAGS = $(COPT)
 
+UNAME:=$(shell uname)
+ifeq($(UNAME),FreeBSD)
+DEFOS="FreeBSD"
+CFLAGS += -D $DEFOS
+endif
+
 default:
 
 conf.mk:
