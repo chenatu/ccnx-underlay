@@ -87,6 +87,7 @@ typedef int (*ccnd_logger)(void *loggerdata, const char *format, va_list ap);
 struct ccnd_handle {
     unsigned char ccnd_id[32];      /**< sha256 digest of our public key */
     struct hashtb *faces_by_fd;     /**< keyed by fd */
+	struct hashtb *faces_pcap;		/**< keyed by pcap handle */
     struct hashtb *dgram_faces;     /**< keyed by sockaddr */
     struct hashtb *faceid_by_guid;  /**< keyed by guid */
     struct hashtb *content_tab;     /**< keyed by portion of ContentObject */
@@ -248,6 +249,7 @@ struct face {
     unsigned short pktseq;      /**< sequence number for sent packets */
     unsigned short adjstate;    /**< state of adjacency negotiotiation */
 	pcap_t* pcap_handle;
+	size_t pcap_handle_len;
 };
 
 /** face flags */
@@ -427,6 +429,7 @@ struct ccn_underlay_sock {
 
 /**
  * Linked list record for ccn_underlay_sock
+    If not using raw socket, it just record the name of NIC
  */
 struct ccn_underlay_sock_list {
 	struct ccn_underlay_sock usock;

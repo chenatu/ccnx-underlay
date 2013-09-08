@@ -5744,7 +5744,35 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 	if(h->isunderlay == 1){
 		struct ccn_underlay_sock_list * usock_list = h->usock_list;
 		while(usock_list->next != NULL){
+#ifndef FreeBSD
 			usock_list = usock_list->next;
+			//initialzing work of pcap for receiving raw socket
+			char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
+			pcap_t *handle;				/* packet capture handle */
+			char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
+			struct bpf_program fp;			/* compiled filter program (expression) */
+			handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
+			if (handle == NULL) {
+				ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
+			}
+			if(pcap_setdirection(handle, PCAP_D_IN)==-1){
+				ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
+			}
+			/*if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
+						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
+			}
+			/* apply the compiled filter */
+			/*if (pcap_setfilter(handle, NULL) == -1) {
+				ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
+			}*/
+			insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
+			if (pcap_datalink(handle) != DLT_EN10MB) {
+				ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
+			}
+			//This fd is from the struct pcap_t
+			raw_fd = handle->fd;
+			usock_list->usock.sock = raw_fd;
+#else
 			struct sockaddr_ll* raw_addr;
 			raw_addr = calloc(1, sizeof(struct sockaddr_ll));
 			raw_fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
@@ -5787,6 +5815,42 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 		        	return(0);
 		        }
 				usock_list->usock.sock = raw_fd;
+#endif
+#ifdef FreeBSD
+				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
+				struct hashtb_enumerator ee;
+				struct hashtb_enumerator *e = &ee;
+				struct face *face = NULL;
+				unsigned char *addrspace;
+				hashtb_start(h->faces_pcap, e);
+				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(pcap_t)) == HT_NEW_ENTRY) {
+					face = e->data;
+	        		face->recv_fd = raw_fd;
+					face->sendface = CCN_NOFACEID;
+					face->addrlen = e->extsize;
+					addrspace = ((unsigned char *)e->key) + e->keysize;
+					face->pcap_handle = (pcap_t *)addrspace;
+					memcpy(addrspace, (pcap_t *)handle, e->extsize);
+					init_face_flags(h, face, setflags);			
+					res = enroll_face(h, face);
+					if (res == -1) {
+						hashtb_delete(e);
+						face = NULL;
+						ccnd_msg(h, "enroll underlay face failed on fd %d", "underlay", raw_fd);
+					}
+					
+					hashtb_end(e);
+				}
+				if (face == NULL) {
+	            	close(fd);
+	            	return(0);
+	            }
+				h->underlay_faceid = face->faceid;
+				insert_underlay_faceid_list(h->ufaceid_list,face->faceid, usock_list->usock.eth);
+				ccnd_msg(h, "accepting %s connections on fd %d on face %d",
+	                             "underlay", raw_fd, face->faceid);
+				
+#else
 				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
 				struct hashtb_enumerator ee;
 				struct hashtb_enumerator *e = &ee;
@@ -5801,31 +5865,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					addrspace = ((unsigned char *)e->key) + e->keysize;
 					face->raw_addr = (struct sockaddr_ll *)addrspace;
 					memcpy(addrspace, (struct sockaddr_ll *)raw_addr, e->extsize);
-					
-					//initialzing work of pcap for receiving raw socket
-					char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
-					pcap_t *handle;				/* packet capture handle */
-					char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
-					struct bpf_program fp;			/* compiled filter program (expression) */
-					handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
-					if (handle == NULL) {
-						ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
-					}
-					if(pcap_setdirection(handle, PCAP_D_IN)==-1){
-						ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
-					}
-					/*if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
-						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
-					}
-					/* apply the compiled filter */
-					/*if (pcap_setfilter(handle, NULL) == -1) {
-						ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
-					}*/
-					insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
-					if (pcap_datalink(handle) != DLT_EN10MB) {
-						ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
-					}
-
 					face->pcap_handle = handle;
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
@@ -5845,6 +5884,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				insert_underlay_faceid_list(h->ufaceid_list,face->faceid, usock_list->usock.eth);
 				ccnd_msg(h, "accepting %s connections on fd %d on face %d",
 	                             "underlay", raw_fd, face->faceid);
+#endif
 			}
 		}
 	}
