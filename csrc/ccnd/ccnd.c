@@ -5744,7 +5744,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 	if(h->isunderlay == 1){
 		struct ccn_underlay_sock_list * usock_list = h->usock_list;
 		while(usock_list->next != NULL){
-#ifndef FreeBSD
+#ifdef FreeBSD
 			usock_list = usock_list->next;
 			//initialzing work of pcap for receiving raw socket
 			char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
