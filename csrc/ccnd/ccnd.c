@@ -2925,7 +2925,34 @@ Underlay:
 	face = face_from_faceid(h, ufaceid_list->faceid);
 	//face = face_from_faceid(h, h->underlay_faceid);
 	// search hashtable for same data
-
+#ifdef FreeBSD
+	struct hashtb_enumerator ee;
+	struct hashtb_enumerator *e = &ee;
+	newface = NULL;
+	unsigned char *addrspace;
+	hashtb_start(h->faces_pcap, e);
+	setflags |=  CCN_FACE_UDL;
+	res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
+	if (res >= 0) {
+		newface = e->data;
+		newface->recvcount++;
+		if (newface->recv_fd == NULL) {
+            newface->recv_fd = e->key;
+            newface->sendface = face->faceid;
+			newface->pcap_handle_len = e->extsize;
+			newface->pcap_handle = face->pcap_handle;
+            init_face_flags(h, newface, setflags);
+            newface->flags |= CCN_FACE_GG;
+            res = enroll_face(h, newface);
+            if (res == -1) {
+                hashtb_delete(e);
+                newface = NULL;
+            }
+            else
+                ccnd_new_face_msg(h, newface);
+        }
+	}
+#else
 	struct hashtb_enumerator ee;
 	struct hashtb_enumerator *e = &ee;
 	newface = NULL;
@@ -2936,7 +2963,7 @@ Underlay:
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
-		if (newface->raw_addr== NULL) {
+		if (newface->raw_addr == NULL) {
             newface->raw_addr = e->key;
             newface->addrlen = e->keysize;
             newface->recv_fd = face->recv_fd;
@@ -2967,78 +2994,7 @@ Underlay:
     }
     else
         res = ccnd_nack(h, reply_body, 450, "could not create face");
-        // Initialize the raw socket
-	/*raw_sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));//raw_socket is raw socket
-	
-	if (raw_sock == -1)
-	{            
-		ccnd_msg(h, "socket: %s", strerror(errno));
-		goto Finish;
-	}
-	int eth;
-	if (strcmp(face_instance->descr.address, "eth0") == 0)
-	{		
-		eth = 0;
-	}	else if (strcmp(face_instance->descr.address, "eth1") == 0){
-		eth = 1;
-	}	else if (strcmp(face_instance->descr.address, "eth2") == 0){
-		eth = 2;
-	}
-	memset(raw_addr, 0, sizeof(struct sockaddr_ll));
-	raw_addr->sll_family = AF_PACKET;
-	raw_addr->sll_ifindex = get_iface_index(raw_sock, face_instance->descr.address);
-	raw_addr->sll_protocol = htons(ETH_P_ALL);
-	raw_addr->sll_halen = 6;
-	raw_addr->sll_pkttype = PACKET_OUTGOING;
-	int u = set_promisc(h, raw_sock, eth);
-	res = bind(raw_sock, (struct sockaddr*)raw_addr, rawsocklen);
-	if (res < 0) {
-		ccnd_msg(h, "socket bind error: %s", strerror(errno));
-		goto Finish;
-	}
-
-	// search hashtable for same data
-
-	struct hashtb_enumerator ee;
-	struct hashtb_enumerator *e = &ee;
-	face = NULL;
-	unsigned char *addrspace;
-	hashtb_start(h->faces_by_fd, e);
-	setflags &= ~CCN_FACE_CONNECTING;
-	if (hashtb_seek(e, &raw_sock, sizeof(raw_sock), rawsocklen) == HT_NEW_ENTRY) {
-		newface = e->data;
-		newface->recv_fd = raw_sock;
-		newface->sendface = CCN_NOFACEID;
-		newface->addrlen = e->extsize;
-		addrspace = ((unsigned char *)e->key) + e->keysize;
-		newface->raw_addr = (struct sockaddr_ll *)addrspace;
-		memcpy(addrspace, raw_addr, e->extsize);
-		init_face_flags(h, newface, setflags);
-		res = enroll_face(h, newface);
-		if (res == -1) {
-			hashtb_delete(e);
-			newface = NULL;
-		}
-		hashtb_end(e);
-	}
-	 if (newface != NULL) {
-        newface->flags |= CCN_FACE_PERMANENT;
-        face_instance->action = NULL;
-        face_instance->ccnd_id = h->ccnd_id;
-        face_instance->ccnd_id_size = sizeof(h->ccnd_id);
-        face_instance->faceid = newface->faceid;
-        face_instance->lifetime = 0x7FFFFFFF;
-        if ((newface->flags & CCN_FACE_CONNECTING) != 0)
-            face_instance->lifetime = 1;
-        res = ccnb_append_face_instance(reply_body, face_instance);
-        if (res > 0)
-            res = 0;
-    }
-    else
-        res = ccnd_nack(h, reply_body, 450, "could not create face");*/
-
-
-
+#endif
 Finish:
     h->flood = save; /* restore saved flood flag */
     ccn_face_instance_destroy(&face_instance);
@@ -5095,15 +5051,16 @@ process_input(struct ccnd_handle *h, int fd)
     memset(&sstor, 0, sizeof(sstor));
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
-		tmpbuf = pcap_next(face->pcap_handle, &header);
+#ifdef FreeBSD
+		buf = pcap_next(face->pcap_handle, &header);
 		//memcpy(buf, tmpbuf, header.len);
-		tmpres = header.len;
-		if (tmpres == 60){
+		res = header.len;
+		if (res == 60){
 			//ccnd_msg(h, "length is 60");
-			while (tmpbuf[tmpres-1]==0x00) tmpres--;
-			tmpres += 2;
+			while (buf[res-1]==0x00) res--;
+			res += 2;
 		}
-		
+#else		
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
 			0, (struct sockaddr*)(face->raw_addr), &rawaddrlen);
 		if (res == 60){
@@ -5111,9 +5068,10 @@ process_input(struct ccnd_handle *h, int fd)
 			while (buf[res-1]==0x00) res--;
 			res += 2;
 		}
-		ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
-		ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, tmpbuf, tmpres);
+#endif
+		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
+		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
+		//ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, tmpbuf, tmpres);
 	}
     else{
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
@@ -5361,7 +5319,15 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
+#ifdef FreeBSD
+		if (pcap_inject(face->pcap_handle, data, size)==-1) {
+			pcap_perror(face->pcap_handle, 0);
+    		pcap_close(pcap);
+    		ccnd_msg(h,"pcap inject error, the fd of pcap %d closed.",face->pcap_handle->fd);
+		}
+#else
 		res = sendto(face->recv_fd, data, size, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
+#endif
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
@@ -5827,7 +5793,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					face = e->data;
 	        		face->recv_fd = raw_fd;
 					face->sendface = CCN_NOFACEID;
-					face->addrlen = e->extsize;
+					face->pcap_handle_len= e->extsize;
 					addrspace = ((unsigned char *)e->key) + e->keysize;
 					face->pcap_handle = (pcap_t *)addrspace;
 					memcpy(addrspace, (pcap_t *)handle, e->extsize);
