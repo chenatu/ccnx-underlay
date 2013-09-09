@@ -5322,7 +5322,7 @@ ccnd_send(struct ccnd_handle *h,
 #ifdef FreeBSD
 		if (pcap_inject(face->pcap_handle, data, size)==-1) {
 			pcap_perror(face->pcap_handle, 0);
-    		pcap_close(pcap);
+    		pcap_close(face->pcap_handle);
     		ccnd_msg(h,"pcap inject error, the fd of pcap %d closed.",face->pcap_handle->fd);
 		}
 #else
