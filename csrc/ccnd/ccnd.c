@@ -5049,7 +5049,6 @@ process_input(struct ccnd_handle *h, int fd)
         memset(d, 0, sizeof(*d));
     buf = ccn_charbuf_reserve(face->inbuf, 8800);
     memset(&sstor, 0, sizeof(sstor));
-	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
 #ifdef FreeBSD
 		buf = pcap_next(face->pcap_handle, &header);
@@ -5060,7 +5059,8 @@ process_input(struct ccnd_handle *h, int fd)
 			while (buf[res-1]==0x00) res--;
 			res += 2;
 		}
-#else		
+#else
+		int rawaddrlen = sizeof(struct sockaddr_ll);
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
 			0, (struct sockaddr*)(face->raw_addr), &rawaddrlen);
 		if (res == 60){
