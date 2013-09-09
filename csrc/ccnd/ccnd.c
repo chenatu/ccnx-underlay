@@ -5084,6 +5084,7 @@ process_input(struct ccnd_handle *h, int fd)
     else if (res == 0 && (face->flags & CCN_FACE_DGRAM) == 0)
         shutdown_client_fd(h, fd);
     else {
+		//Sorry, I forgot what is the meaning here...
 		if((face->flags & CCN_FACE_UDL) != CCN_FACE_UDL){
         	source = get_dgram_source(h, face, addr, addrlen, (res == 1) ? 1 : 2);
 		}else{
@@ -5095,6 +5096,31 @@ process_input(struct ccnd_handle *h, int fd)
 			} else if((face->flags & CCN_FACE_MCAST) != 0){
 				source = face;
 			} else {
+#ifdef FreeBSD
+				hashtb_start(h->faces_pcap, e);
+				res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
+				if (res >= 0) {
+					source = e->data;
+					source->recvcount++;
+					if (source->recv_fd == NULL) {
+			            source->recv_fd = e->key;
+			            source->sendface = face->faceid;
+						source->pcap_handle_len = e->extsize;
+						source->pcap_handle = face->pcap_handle;
+			            init_face_flags(h, source, CCN_FACE_UDL);
+			            newface->flags |= CCN_FACE_GG;
+			            if (res == 1 && (source->flags & CCN_FACE_LOOPBACK) != 0)
+							source->flags |= CCN_FACE_GG;
+						res = enroll_face(h, source);
+						if (res == -1) {
+							hashtb_delete(e);
+							source = NULL;
+						}
+			            else
+			                ccnd_new_face_msg(h, newface);
+			        }
+				}
+#else
 				hashtb_start(h->dgram_faces, e);
 				if (hashtb_seek(e, (struct sockaddr*)(face->raw_addr), rawaddrlen, 0)>=0) {
 					source = e->data;
@@ -5117,6 +5143,7 @@ process_input(struct ccnd_handle *h, int fd)
 							ccnd_new_face_msg(h, source);
 					}
 					hashtb_end(e);
+#endif
 				}			
 			}
 		}
