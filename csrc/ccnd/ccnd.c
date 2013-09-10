@@ -5118,7 +5118,7 @@ process_input(struct ccnd_handle *h, int fd)
 						source->pcap_handle_len = e->extsize;
 						source->pcap_handle = face->pcap_handle;
 			            init_face_flags(h, source, CCN_FACE_UDL);
-			            newface->flags |= CCN_FACE_GG;
+			            source->flags |= CCN_FACE_GG;
 			            if (res == 1 && (source->flags & CCN_FACE_LOOPBACK) != 0)
 							source->flags |= CCN_FACE_GG;
 						res = enroll_face(h, source);
