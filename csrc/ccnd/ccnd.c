@@ -41,8 +41,10 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <netinet/in.h>
+#ifndef FreeBSD
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
+#endif
 #include <stdarg.h>
 
 
