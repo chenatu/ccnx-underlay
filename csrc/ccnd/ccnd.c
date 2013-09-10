@@ -2803,9 +2803,9 @@ ccnd_req_newface(struct ccnd_handle *h,
 #ifdef FreeBSD
 #else
 	struct sockaddr_ll *raw_addr;//raw_addr is configuration for RAW SOCK
-#endif
 	int rawsocklen = sizeof(struct sockaddr_ll);
 	raw_addr = calloc(1, sizeof(struct sockaddr_ll));
+#endif
 	int raw_sock;
 	int setflags = 0;
 	struct ccn_underlay_faceid_list *ufaceid_list = h->ufaceid_list;
