@@ -1238,8 +1238,7 @@ init_face_flags(struct ccnd_handle *h, struct face *face, int setflags)
 	        face->flags |= (CCN_FACE_GG | CCN_FACE_LOCAL);
 #ifdef FreeBSD
 	}else if (face->pcap_handle!= NULL){
-		if(raw_addr->sll_family == AF_PACKET)
-			face->flags |= CCN_FACE_UDL;
+		face->flags |= CCN_FACE_UDL;
 #else
     }else if (raw_addr != NULL){
 		if(raw_addr->sll_family == AF_PACKET)
