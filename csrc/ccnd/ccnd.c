@@ -5350,7 +5350,7 @@ ccnd_send(struct ccnd_handle *h,
 		if (pcap_inject(face->pcap_handle, data, size)==-1) {
 			pcap_perror(face->pcap_handle, 0);
     		pcap_close(face->pcap_handle);
-    		ccnd_msg(h,"pcap inject error, the fd of pcap %d closed.",face->pcap_handle->fd);
+    		ccnd_msg(h,"pcap inject error, the fd of pcap %d closed.", face->pcap_handle->fd);
 		}
 #else
 		res = sendto(face->recv_fd, data, size, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
@@ -5753,7 +5753,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 			}
 			/*if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
 						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
-			}
+			}*/
 			/* apply the compiled filter */
 			/*if (pcap_setfilter(handle, NULL) == -1) {
 				ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
