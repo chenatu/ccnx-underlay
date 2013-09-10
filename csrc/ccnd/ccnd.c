@@ -5127,7 +5127,7 @@ process_input(struct ccnd_handle *h, int fd)
 							source = NULL;
 						}
 			            else
-			                ccnd_new_face_msg(h, newface);
+			                ccnd_new_face_msg(h, source);
 			        }
 				}
 #else
