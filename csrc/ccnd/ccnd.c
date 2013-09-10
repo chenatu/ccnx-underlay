@@ -2800,7 +2800,10 @@ ccnd_req_newface(struct ccnd_handle *h,
     struct face *newface = NULL;
     int save;
     int nackallowed = 0;
+#ifdef FreeBSD
+#else
 	struct sockaddr_ll *raw_addr;//raw_addr is configuration for RAW SOCK
+#endif
 	int rawsocklen = sizeof(struct sockaddr_ll);
 	raw_addr = calloc(1, sizeof(struct sockaddr_ll));
 	int raw_sock;
