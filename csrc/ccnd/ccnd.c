@@ -340,7 +340,7 @@ enroll_face(struct ccnd_handle *h, struct face *face)
     while (--i > n)
         a[i] = NULL;
     h->faces_by_faceid = a;
-	pcap_t* pcap_handle;
+	struct pcap* pcap_handle;
 use_i:
     a[i] = face;
     h->face_rover = i + 1;
@@ -2942,7 +2942,7 @@ Underlay:
 	unsigned char *addrspace;
 	hashtb_start(h->faces_pcap, e);
 	setflags |=  CCN_FACE_UDL;
-	res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
+	res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(struct pcap));
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
@@ -5108,7 +5108,7 @@ process_input(struct ccnd_handle *h, int fd)
 			} else {
 #ifdef FreeBSD
 				hashtb_start(h->faces_pcap, e);
-				res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
+				res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(struct pcap));
 				if (res >= 0) {
 					source = e->data;
 					source->recvcount++;
@@ -5751,7 +5751,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 			usock_list = usock_list->next;
 			//initialzing work of pcap for receiving raw socket
 			char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
-			pcap_t *handle;				/* packet capture handle */
+			struct pcap *handle;				/* packet capture handle */
 			char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
 			struct bpf_program fp;			/* compiled filter program (expression) */
 			handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
@@ -5826,14 +5826,14 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				struct face *face = NULL;
 				unsigned char *addrspace;
 				hashtb_start(h->faces_pcap, e);
-				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(pcap_t)) == HT_NEW_ENTRY) {
+				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(struct pcap)) == HT_NEW_ENTRY) {
 					face = e->data;
 	        		face->recv_fd = raw_fd;
 					face->sendface = CCN_NOFACEID;
 					face->pcap_handle_len= e->extsize;
 					addrspace = ((unsigned char *)e->key) + e->keysize;
-					face->pcap_handle = (pcap_t *)addrspace;
-					memcpy(addrspace, (pcap_t *)handle, e->extsize);
+					face->pcap_handle = (struct pcap *)addrspace;
+					memcpy(addrspace, (struct pcap *)handle, e->extsize);
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
@@ -6415,7 +6415,7 @@ void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *ulist, int fac
 	p->eth = eth;
 	p->next = NULL;
 }
-void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_handle, char* eth)
+void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, struct pcap *pcap_handle, char* eth)
 {
 	struct ccn_pcap_handle_list * p = plist;
 	while (p->next != NULL)
