@@ -36,7 +36,7 @@
 #include <ccn/reg_mgmt.h>
 #include <ccn/schedule.h>
 #include <ccn/seqwriter.h>
-#include <pcap.h>
+#include <pcap/pcap.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ctype.h>
