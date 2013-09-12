@@ -584,7 +584,7 @@ extern const char *ccnd_usage_message;
 void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist, char* eth, int sock);
 void print_underlay_sock_list(struct ccn_underlay_sock_list *ulist);
 void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *ulist, int faceid, char* eth);
-void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, struct pcap *pcap_handle, char* eth);
+void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_handle, char* eth);
 
 
 #endif

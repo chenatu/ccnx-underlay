@@ -340,7 +340,7 @@ enroll_face(struct ccnd_handle *h, struct face *face)
     while (--i > n)
         a[i] = NULL;
     h->faces_by_faceid = a;
-	struct pcap* pcap_handle;
+	pcap_t* pcap_handle;
 use_i:
     a[i] = face;
     h->face_rover = i + 1;
@@ -2942,7 +2942,7 @@ Underlay:
 	unsigned char *addrspace;
 	hashtb_start(h->faces_pcap, e);
 	setflags |=  CCN_FACE_UDL;
-	res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(struct pcap));
+	res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
@@ -5032,7 +5032,7 @@ process_input(struct ccnd_handle *h, int fd)
     struct sockaddr *addr = (struct sockaddr *)&sstor;
     int err = 0;
     socklen_t err_sz;
-    struct pcap_pkthdr header;	/* The header that pcap gives us */
+    pcap_t_pkthdr header;	/* The header that pcap gives us */
 	
     face = hashtb_lookup(h->faces_by_fd, &fd, sizeof(fd));
     if (face == NULL)
@@ -5108,7 +5108,7 @@ process_input(struct ccnd_handle *h, int fd)
 			} else {
 #ifdef FreeBSD
 				hashtb_start(h->faces_pcap, e);
-				res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(struct pcap));
+				res = hashtb_seek(e, &(face->recv_fd), sizeof(face->recv_fd), sizeof(pcap_t));
 				if (res >= 0) {
 					source = e->data;
 					source->recvcount++;
@@ -5751,7 +5751,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 			usock_list = usock_list->next;
 			//initialzing work of pcap for receiving raw socket
 			char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
-			struct pcap *handle;				/* packet capture handle */
+			pcap_t *handle;				/* packet capture handle */
 			char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
 			struct bpf_program fp;			/* compiled filter program (expression) */
 			handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
@@ -5772,7 +5772,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 			if (pcap_datalink(handle) != DLT_EN10MB) {
 				ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
 			}
-			//This fd is from the struct pcap_t
+			//This fd is from the pcap_t_t
 			raw_fd = handle->fd;
 			usock_list->usock.sock = raw_fd;
 #else
@@ -5826,14 +5826,14 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				struct face *face = NULL;
 				unsigned char *addrspace;
 				hashtb_start(h->faces_pcap, e);
-				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(struct pcap)) == HT_NEW_ENTRY) {
+				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(pcap_t)) == HT_NEW_ENTRY) {
 					face = e->data;
 	        		face->recv_fd = raw_fd;
 					face->sendface = CCN_NOFACEID;
 					face->pcap_handle_len= e->extsize;
 					addrspace = ((unsigned char *)e->key) + e->keysize;
-					face->pcap_handle = (struct pcap *)addrspace;
-					memcpy(addrspace, (struct pcap *)handle, e->extsize);
+					face->pcap_handle = (pcap_t *)addrspace;
+					memcpy(addrspace, (pcap_t *)handle, e->extsize);
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
@@ -5847,12 +5847,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				if (face == NULL) {
 	            	close(fd);
 	            	return(0);
-	            }
-				h->underlay_faceid = face->faceid;
-				insert_underlay_faceid_list(h->ufaceid_list,face->faceid, usock_list->usock.eth);
-				ccnd_msg(h, "accepting %s connections on fd %d on face %d",
-	                             "underlay", raw_fd, face->faceid);
-				
+	            }				
 #else
 				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
 				struct hashtb_enumerator ee;
@@ -5883,11 +5878,11 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 	            	close(fd);
 	            	return(0);
 	            }
+#endif
 				h->underlay_faceid = face->faceid;
 				insert_underlay_faceid_list(h->ufaceid_list,face->faceid, usock_list->usock.eth);
 				ccnd_msg(h, "accepting %s connections on fd %d on face %d",
 	                             "underlay", raw_fd, face->faceid);
-#endif
 			}
 		}
 	}
@@ -6415,7 +6410,7 @@ void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *ulist, int fac
 	p->eth = eth;
 	p->next = NULL;
 }
-void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, struct pcap *pcap_handle, char* eth)
+void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_handle, char* eth)
 {
 	struct ccn_pcap_handle_list * p = plist;
 	while (p->next != NULL)
