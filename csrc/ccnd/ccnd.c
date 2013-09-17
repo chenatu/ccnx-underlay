@@ -6303,7 +6303,7 @@ void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 	memset(&ifr, 0, sizeof(ifr));
 	strcpy(ifr.ifr_name, eth);
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
-	memcpy((void*)source, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
+	memcpy((void*)sourceMAC, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
 void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,int sock)
