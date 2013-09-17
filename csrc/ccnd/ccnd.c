@@ -5363,13 +5363,13 @@ ccnd_send(struct ccnd_handle *h,
 		unsigned char source[ETH_ALEN];
 		lookup_SourceMAC(face->recv_fd, face->eth, source);		
 		//construct the ethernet frame
-		size_t bufferlen = ETHERTYPE_LEN + 2*MAC_ADDR_LEN + size;
+		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
-		memcpy(buffer, broaddest, MAC_ADDR_LEN);
-		memcpy((buffer+MAC_ADDR_LEN), source, MAC_ADDR_LEN);
+		memcpy(buffer, broaddest, 6);
+		memcpy((buffer+6), source, 6);
 		short int etherTypeT = htons(ETH_P_ALL);
-		memcpy((buffer+(2*MAC_ADDR_LEN)), &(etherTypeT), sizeof(etherTypeT));
+		memcpy((buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
 		memcpy((buffer+ETHERTYPE_LEN+(2*MAC_ADDR_LEN)), data, size	);
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
 	}
@@ -5765,7 +5765,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				raw_addr->sll_protocol = htons(ETH_P_ALL);
 				raw_addr->sll_halen = ETH_ALEN;
 				raw_addr->sll_pkttype = PACKET_OUTGOING;
-				memcpy((void*)(raw_addr.sll_addr), (void*)broaddest, ETH_ALEN);
+				memcpy((void*)(raw_addr->sll_addr), (void*)broaddest, ETH_ALEN);
 				int u = set_promisc(h, raw_fd, usock_list->usock.eth);
 				res = fcntl(fd, F_SETFL, O_NONBLOCK);
 	   			if (res == -1)
@@ -5804,13 +5804,15 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					if(pcap_setdirection(handle, PCAP_D_IN)==-1){
 						ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
 					}
+					/*
 					if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
 						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
-					}
-					/* apply the compiled filter */
+					}*/
+					// apply the compiled filter
+					/*
 					if (pcap_setfilter(handle, NULL) == -1) {
 						ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
-					}
+					}*/
 					insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
 					if (pcap_datalink(handle) != DLT_EN10MB) {
 						ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);

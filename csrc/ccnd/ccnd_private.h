@@ -583,10 +583,14 @@ void ccnd_run(struct ccnd_handle *h);
 void ccnd_destroy(struct ccnd_handle **);
 extern const char *ccnd_usage_message;
 
-void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist, char* eth, int sock);
-void print_underlay_sock_list(struct ccn_underlay_sock_list *ulist);
-void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *ulist, int faceid, char* eth);
-void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_handle, char* eth);
+void insert_underlay_sock_list(struct ccn_underlay_sock_list *, char* , int );
+void print_underlay_sock_list(struct ccn_underlay_sock_list *);
+void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *, int , char* );
+void insert_pcap_handle_list(struct ccn_pcap_handle_list *, pcap_t *, char* );
+
+int get_iface_index(int , const char* );
+int set_promisc(struct ccnd_handle *, int fd, char* );
+void lookup_SourceMAC(int, char* , char* );
 
 
 #endif
