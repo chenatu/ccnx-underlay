@@ -5095,25 +5095,24 @@ process_input(struct ccnd_handle *h, int fd)
     memset(&sstor, 0, sizeof(sstor));
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
-		tmpbuf = pcap_next(face->pcap_handle, &header);
+		buf = pcap_next(face->pcap_handle, &header);
 		//memcpy(buf, tmpbuf, header.len);
-		tmpres = header.len;
-		if (tmpres == 60){
+		res = header.len;
+		if (res == 60){
 			//ccnd_msg(h, "length is 60");
-			while (tmpbuf[tmpres-1]==0x00) tmpres--;
-			tmpres += 2;
+			while (buf[res-1]==0x00) tmpres--;
+			res += 2;
 		}
-		
-		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
+		/*res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
 			0, (struct sockaddr*)(face->raw_addr), &rawaddrlen);
 		if (res == 60){
 			//ccnd_msg(h, "length is 60");
 			while (buf[res-1]==0x00) res--;
 			res += 2;
-		}
-		ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
-		ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, tmpbuf, tmpres);
+		}*/
+		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
+		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
+		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
 	}
     else{
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
@@ -5361,7 +5360,18 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		res = sendto(face->recv_fd, data, size, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
+		lookup_SourceMAC(char * source);
+		unsigned char source[ETH_ALEN];
+		//construct the ethernet frame
+		size_t bufferlen = ETHERTYPE_LEN + 2*MAC_ADDR_LEN + size;
+		char buffer[bufferlen];
+		memset(buffer, 0, bufferlen);
+		memcpy(buffer, broaddest, MAC_ADDR_LEN);
+		memcpy((buffer+MAC_ADDR_LEN), source, MAC_ADDR_LEN);
+		short int etherTypeT = htons(ETH_P_ALL);
+		memcpy((buffer+(2*MAC_ADDR_LEN)), &(etherTypeT), sizeof(etherTypeT));
+		memcpy((buffer+ETHERTYPE_LEN+(2*MAC_ADDR_LEN)), data, size	);
+		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
@@ -5753,30 +5763,10 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				raw_addr->sll_family = AF_PACKET;
 				raw_addr->sll_ifindex = get_iface_index(raw_fd, usock_list->usock.eth);
 				raw_addr->sll_protocol = htons(ETH_P_ALL);
-				raw_addr->sll_halen = 6;
+				raw_addr->sll_halen = ETH_ALEN;
 				raw_addr->sll_pkttype = PACKET_OUTGOING;
-				int eth = -1;
-				if (strcmp(usock_list->usock.eth, "eth0") == 0)
-				{		
-					eth = 0;
-				}	else if (strcmp(usock_list->usock.eth, "eth1") == 0){
-					eth = 1;
-				}	else if (strcmp(usock_list->usock.eth, "eth2") == 0){
-					eth = 2;
-				}	else if (strcmp(usock_list->usock.eth, "eth3") == 0){
-					eth = 3;
-				}	else if (strcmp(usock_list->usock.eth, "eth4") == 0){
-					eth = 4;
-				}	else if (strcmp(usock_list->usock.eth, "eth5") == 0){
-					eth = 5;
-				}	else if (strcmp(usock_list->usock.eth, "eth6") == 0){
-					eth = 6;
-				}	else if (strcmp(usock_list->usock.eth, "eth7") == 0){
-					eth = 7;
-				}	else if (strcmp(usock_list->usock.eth, "eth8") == 0){
-					eth = 8;
-				}
-				int u = set_promisc(h, raw_fd, eth);
+				memcpy((void*)(raw_addr.sll_addr), (void*)broaddest, ETH_ALEN);
+				int u = set_promisc(h, raw_fd, usock_list->usock.eth);
 				res = fcntl(fd, F_SETFL, O_NONBLOCK);
 	   			if (res == -1)
 	        		ccnd_msg(h, "fcntl: %s", strerror(errno));
@@ -5814,13 +5804,13 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					if(pcap_setdirection(handle, PCAP_D_IN)==-1){
 						ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
 					}
-					/*if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
+					if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
 						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
 					}
 					/* apply the compiled filter */
-					/*if (pcap_setfilter(handle, NULL) == -1) {
+					if (pcap_setfilter(handle, NULL) == -1) {
 						ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
-					}*/
+					}
 					insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
 					if (pcap_datalink(handle) != DLT_EN10MB) {
 						ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
@@ -6286,45 +6276,15 @@ int get_iface_index(int fd, const char* interface_name)
     return ifr.ifr_ifindex;
 }
 
-int set_promisc(struct ccnd_handle *h, int f, int n){
+int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 	struct ifreq ifr;
 	int s = 0;
 	memset(&ifr, 0, sizeof(ifr));
-	switch(n){
-	case 0:
-		strcpy(ifr.ifr_name, "eth0");
-		break;
-	case 1:
-		strcpy(ifr.ifr_name, "eth1");
-		break;
-	case 2:
-		strcpy(ifr.ifr_name, "eth2");
-		break;
-	case 3:
-		strcpy(ifr.ifr_name, "eth3");
-		break;
-	case 4:
-		strcpy(ifr.ifr_name, "eth4");
-		break;
-	case 5:
-		strcpy(ifr.ifr_name, "eth5");
-		break;
-	case 6:
-		strcpy(ifr.ifr_name, "eth6");
-		break;
-	case 7:
-		strcpy(ifr.ifr_name, "eth7");
-		break;
-	case 8: 
-		strcpy(ifr.ifr_name, "eth8");
-		break;
-	default:
-		break;	
-	}
-	if ((s = ioctl(f, SIOCGIFFLAGS, &ifr)) < 0)
+	strcpy(ifr.ifr_name, eth);
+	if ((s = ioctl(fd, SIOCGIFFLAGS, &ifr)) < 0)
 	{		
 		ccnd_msg(h, "IOCTL error one!");
-		close(f);
+		close(fd);
 		return(-1);
 	}
 	ifr.ifr_flags|= IFF_PROMISC;
@@ -6334,6 +6294,13 @@ int set_promisc(struct ccnd_handle *h, int f, int n){
 	}
 	ccnd_msg(h, "IOCTL success!");
 	return(1);
+}
+
+//Should malloc space char source[ETH_ALEN] outside this function
+void lookup_SourceMAC(char* source)
+{	
+	ioctl(s, SIOCGIFHWADDR, &buffer)
+	memcpy((void*)source, (void*)(buffer.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
 void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,int sock)
