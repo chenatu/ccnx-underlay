@@ -6302,7 +6302,7 @@ void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 	struct ifreq ifr;
 	memset(&ifr, 0, sizeof(ifr));
 	strcpy(ifr.ifr_name, eth);
-	ioctl(fd, SIOCGIFHWADDR, &ifr)
+	ioctl(fd, SIOCGIFHWADDR, &ifr);
 	memcpy((void*)source, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
