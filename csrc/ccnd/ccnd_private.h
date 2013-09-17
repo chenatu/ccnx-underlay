@@ -447,9 +447,6 @@ struct ccn_pcap_handle_list {
 	struct ccn_pcap_handle_list *next;
 };
 
-//This public MAC address is for broadcast
-
-unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 
 /* create and destroy procs for separately allocated meters */

@@ -5366,6 +5366,8 @@ ccnd_send(struct ccnd_handle *h,
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
+		//This public MAC address is for broadcast
+		unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 		memcpy(buffer, broaddest, 6);
 		memcpy((buffer+6), source, 6);
 		short int etherTypeT = htons(ETH_P_ALL);
@@ -5765,6 +5767,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				raw_addr->sll_protocol = htons(ETH_P_ALL);
 				raw_addr->sll_halen = ETH_ALEN;
 				raw_addr->sll_pkttype = PACKET_OUTGOING;
+				unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 				memcpy((void*)(raw_addr->sll_addr), (void*)broaddest, ETH_ALEN);
 				int u = set_promisc(h, raw_fd, usock_list->usock.eth);
 				res = fcntl(fd, F_SETFL, O_NONBLOCK);
