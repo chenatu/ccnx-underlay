@@ -247,6 +247,7 @@ struct face {
     struct ccnd_meter *meter[CCND_FACE_METER_N];
     unsigned short pktseq;      /**< sequence number for sent packets */
     unsigned short adjstate;    /**< state of adjacency negotiotiation */
+	char* eth;
 	pcap_t* pcap_handle;
 };
 

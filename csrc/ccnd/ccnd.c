@@ -5360,8 +5360,8 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		lookup_SourceMAC(char * source);
 		unsigned char source[ETH_ALEN];
+		lookup_SourceMAC(face->recv_fd, face->eth, source);		
 		//construct the ethernet frame
 		size_t bufferlen = ETHERTYPE_LEN + 2*MAC_ADDR_LEN + size;
 		char buffer[bufferlen];
@@ -5791,7 +5791,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					addrspace = ((unsigned char *)e->key) + e->keysize;
 					face->raw_addr = (struct sockaddr_ll *)addrspace;
 					memcpy(addrspace, (struct sockaddr_ll *)raw_addr, e->extsize);
-					
+					face->eth = usock_list->usock.eth;
 					//initialzing work of pcap for receiving raw socket
 					char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
 					pcap_t *handle;				/* packet capture handle */
@@ -6296,11 +6296,14 @@ int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 	return(1);
 }
 
-//Should malloc space char source[ETH_ALEN] outside this function
-void lookup_SourceMAC(char* source)
+//Should malloc space char source[ETH_ALEN] outside this function,
+void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 {	
-	ioctl(s, SIOCGIFHWADDR, &buffer)
-	memcpy((void*)source, (void*)(buffer.ifr_hwaddr.sa_data), ETH_ALEN);
+	struct ifreq ifr;
+	memset(&ifr, 0, sizeof(ifr));
+	strcpy(ifr.ifr_name, eth);
+	ioctl(fd, SIOCGIFHWADDR, &ifr)
+	memcpy((void*)source, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
 void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,int sock)
