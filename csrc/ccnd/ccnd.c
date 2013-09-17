@@ -5369,7 +5369,7 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy(buffer, broaddest, 6);
 		memcpy((buffer+6), source, 6);
 		short int etherTypeT = htons(ETH_P_ALL);
-		memcpy((buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
+		memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
 		memcpy((buffer+ETHERTYPE_LEN+(2*MAC_ADDR_LEN)), data, size	);
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
 	}
