@@ -6288,7 +6288,7 @@ int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 		return(-1);
 	}
 	ifr.ifr_flags|= IFF_PROMISC;
-	if ((s = ioctl(f, SIOCSIFFLAGS, &ifr)) < 0)	{
+	if ((s = ioctl(fd, SIOCSIFFLAGS, &ifr)) < 0)	{
 		ccnd_msg(h, "IOCTL error two!");
 		return(-1);
 	}
