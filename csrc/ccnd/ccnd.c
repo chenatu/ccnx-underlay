@@ -5095,8 +5095,8 @@ process_input(struct ccnd_handle *h, int fd)
     memset(&sstor, 0, sizeof(sstor));
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
-		buf = pcap_next(face->pcap_handle, &header);
-		//memcpy(buf, tmpbuf, header.len);
+		tmpbuf = pcap_next(face->pcap_handle, &header);
+		memcpy(buf, tmpbuf, header.len);
 		res = header.len;
 		if (res == 60){
 			//ccnd_msg(h, "length is 60");
