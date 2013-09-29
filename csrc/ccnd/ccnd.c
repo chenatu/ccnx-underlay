@@ -5360,8 +5360,9 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		unsigned char source[ETH_ALEN];
-		lookup_SourceMAC(face->recv_fd, face->eth, source);		
+		unsigned char sourceMAC[ETH_ALEN];
+		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
+		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
@@ -5369,11 +5370,12 @@ ccnd_send(struct ccnd_handle *h,
 		//This public MAC address is for broadcast
 		unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 		memcpy(buffer, broaddest, 6);
-		memcpy((buffer+6), source, 6);
+		memcpy((buffer+6), sourceMAC, 6);
 		short int etherTypeT = htons(ETH_P_ALL);
 		memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
 		memcpy((buffer+2+(2*6)), data, size	);
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
+		ccnd_msg(h, "ccnd_send udl buffer: %s", buffer);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
