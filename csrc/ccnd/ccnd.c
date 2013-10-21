@@ -4539,7 +4539,7 @@ process_incoming_interest(struct ccnd_handle *h, struct face *face,
         }
         if (!matched && npe != NULL && (pi->answerfrom & CCN_AOK_EXPIRE) == 0)
             propagate_interest(h, face, msg, pi, npe);
-			ccnd_msg(h, "2 propagate_interest face %d", face->faceid);
+			ccnd_msg(h, "2 propagate_interest face %d, fd: %d", face->faceid, face->recv_fd);
     Bail:
         hashtb_end(e);
     }
@@ -5355,7 +5355,7 @@ ccnd_send(struct ccnd_handle *h,
     if (face == h->face0) {
         ccnd_meter_bump(h, face->meter[FM_BYTO], size);
         ccn_dispatch_message(h->internal_client, (void *)data, size);
-		ccnd_msg(h, "ccnd_send face0 data: %s", data);
+		ccnd_msg(h, "ccnd_send face0 data: %s size: %d", data, size);
         ccnd_internal_client_has_somthing_to_say(h);
         return;
     }
