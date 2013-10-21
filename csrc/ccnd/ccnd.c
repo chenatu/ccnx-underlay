@@ -5360,7 +5360,6 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		ccnd_msg(h, "into (face->flags & CCN_FACE_UDL) != 0");
 		unsigned char sourceMAC[ETH_ALEN];
 		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
