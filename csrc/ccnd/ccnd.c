@@ -2941,8 +2941,9 @@ Underlay:
             newface->addrlen = e->keysize;
             newface->recv_fd = face->recv_fd;
             newface->sendface = face->faceid;
+			newface->eth = ueth;
             init_face_flags(h, newface, setflags);
-                newface->flags |= CCN_FACE_GG;
+            newface->flags |= CCN_FACE_GG;
             res = enroll_face(h, newface);
 			ccnd_msg(h,"newface eth: %s", newface->eth);
             if (res == -1) {
