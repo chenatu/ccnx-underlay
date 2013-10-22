@@ -6316,6 +6316,7 @@ void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 	struct ifreq ifr;
 	memset(&ifr, 0, sizeof(ifr));
 	strcpy(ifr.ifr_name, eth);
+	printf("before SIOCGIFHWADDR\n");
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
 	printf("after SIOCGIFHWADDR\n");
 	memcpy((void*)sourceMAC, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
