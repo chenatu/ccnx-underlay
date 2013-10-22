@@ -2945,7 +2945,7 @@ Underlay:
             init_face_flags(h, newface, setflags);
             newface->flags |= CCN_FACE_GG;
             res = enroll_face(h, newface);
-			ccnd_msg(h,"newface eth: %s", newface->eth);
+			ccnd_msg(h,"newface eth: %s fd: %d id: %d", newface->eth, newface->recv_fd, newface->faceid);
             if (res == -1) {
                 hashtb_delete(e);
                 newface = NULL;
@@ -5147,6 +5147,7 @@ process_input(struct ccnd_handle *h, int fd)
 						source->addrlen = e->keysize;
 						source->recv_fd = face->recv_fd;
 						source->sendface = face->faceid;
+						source->eth = face->eth;
 						source->pcap_handle = face->pcap_handle;
 						init_face_flags(h, source, CCN_FACE_UDL);
 						if (res == 1 && (source->flags & CCN_FACE_LOOPBACK) != 0)
@@ -5383,7 +5384,7 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy((buffer+2+(2*6)), data, size	);
 		ccnd_msg(h,"---4---");
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
-		ccnd_msg(h, "ccnd_send udl buffer: %s", buffer);
+		ccnd_msg(h, "ccnd_send udl buffer: %s size: %d", buffer, bufferlen);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
