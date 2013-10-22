@@ -5362,6 +5362,7 @@ ccnd_send(struct ccnd_handle *h,
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
 		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0");
 		unsigned char sourceMAC[ETH_ALEN];
+		ccnd_msg(h,"---0---");
 		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
 		ccnd_msg(h,"---1---");
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
@@ -6311,10 +6312,12 @@ int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 //Should malloc space char source[ETH_ALEN] outside this function,
 void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 {	
+	printf("into lookup_SourceMAC\n");
 	struct ifreq ifr;
 	memset(&ifr, 0, sizeof(ifr));
 	strcpy(ifr.ifr_name, eth);
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
+	printf("after SIOCGIFHWADDR\n");
 	memcpy((void*)sourceMAC, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
