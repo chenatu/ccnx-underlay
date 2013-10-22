@@ -6312,9 +6312,11 @@ int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 //Should malloc space char source[ETH_ALEN] outside this function,
 void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 {	
-	printf("into lookup_SourceMAC\n");
+	printf("into lookup_SourceMAC eth:%s\n", eth);
 	struct ifreq ifr;
+	printf("---1---\n");
 	memset(&ifr, 0, sizeof(ifr));
+	printf("---2---\n");
 	strcpy(ifr.ifr_name, eth);
 	printf("before SIOCGIFHWADDR\n");
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
