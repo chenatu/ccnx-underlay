@@ -2944,6 +2944,7 @@ Underlay:
             init_face_flags(h, newface, setflags);
                 newface->flags |= CCN_FACE_GG;
             res = enroll_face(h, newface);
+			ccnd_msg(h,"newface eth: %s", newface->eth);
             if (res == -1) {
                 hashtb_delete(e);
                 newface = NULL;
@@ -4539,7 +4540,7 @@ process_incoming_interest(struct ccnd_handle *h, struct face *face,
         }
         if (!matched && npe != NULL && (pi->answerfrom & CCN_AOK_EXPIRE) == 0)
             propagate_interest(h, face, msg, pi, npe);
-			ccnd_msg(h, "2 propagate_interest face %d, fd: %d", face->faceid, face->recv_fd);
+			ccnd_msg(h, "2 propagate_interest face %d, fd: %d eth: %s", face->faceid, face->recv_fd, face->eth);
     Bail:
         hashtb_end(e);
     }
@@ -5360,7 +5361,7 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0");
+		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0 eth: %s", face->eth);
 		unsigned char sourceMAC[ETH_ALEN];
 		ccnd_msg(h,"---0---");
 		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
