@@ -4541,7 +4541,7 @@ process_incoming_interest(struct ccnd_handle *h, struct face *face,
         }
         if (!matched && npe != NULL && (pi->answerfrom & CCN_AOK_EXPIRE) == 0)
             propagate_interest(h, face, msg, pi, npe);
-			ccnd_msg(h, "2 propagate_interest face %d, fd: %d eth: %s", face->faceid, face->recv_fd, face->eth);
+			ccnd_msg(h, "2 propagate_interest face %d, fd: %d eth: %s ethid: %d", face->faceid, face->recv_fd, face->eth, face->raw_addr->sll_ifindex);
     Bail:
         hashtb_end(e);
     }
@@ -5363,7 +5363,7 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0 eth: %s", face->eth);
+		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0 eth: %s, ethid: %d", face->eth, face->raw_addr->sll_ifindex);
 		unsigned char sourceMAC[ETH_ALEN];
 		ccnd_msg(h,"---0---");
 		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
@@ -6289,6 +6289,7 @@ int get_iface_index(int fd, const char* interface_name)
     {
         return (-1);
     }
+	printf("get_iface_index: eth %s, ethid %d", ifr.ifr_name, ifr.ifr_ifindex);
     return ifr.ifr_ifindex;
 }
 
@@ -6317,9 +6318,7 @@ void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 {	
 	printf("into lookup_SourceMAC eth:%s\n", eth);
 	struct ifreq ifr;
-	printf("---1---\n");
 	memset(&ifr, 0, sizeof(ifr));
-	printf("---2---\n");
 	strcpy(ifr.ifr_name, eth);
 	printf("before SIOCGIFHWADDR\n");
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
