@@ -4541,7 +4541,7 @@ process_incoming_interest(struct ccnd_handle *h, struct face *face,
         }
         if (!matched && npe != NULL && (pi->answerfrom & CCN_AOK_EXPIRE) == 0)
             propagate_interest(h, face, msg, pi, npe);
-			ccnd_msg(h, "2 propagate_interest face %d, fd: %d eth: %s ethid: %d", face->faceid, face->recv_fd, face->eth, face->raw_addr->sll_ifindex);
+			ccnd_msg(h, "2 propagate_interest face %d, fd: %d eth: %s", face->faceid, face->recv_fd, face->eth);
     Bail:
         hashtb_end(e);
     }
