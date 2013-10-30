@@ -5375,7 +5375,7 @@ ccnd_send(struct ccnd_handle *h,
     	}
 		printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
 
-		lookup_SourceMAC(face->recv_fd, eth, sourceMAC);
+		lookup_SourceMAC(face->recv_fd, ifr.ifr_name, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
 		size_t bufferlen = 2 + 2*6 + size;
