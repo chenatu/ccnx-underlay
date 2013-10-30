@@ -5097,7 +5097,7 @@ process_input(struct ccnd_handle *h, int fd)
     memset(&sstor, 0, sizeof(sstor));
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
-		ccnd_msg(h,"process input udl, pcap handle fd: %d", face->pcap_handle->fd);
+		ccnd_msg(h,"process input udl");
 		tmpbuf = pcap_next(face->pcap_handle, &header);
 		ccnd_msg(h,"process input udl complete");
 		memcpy(buf, tmpbuf, header.len);
