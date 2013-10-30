@@ -5099,7 +5099,7 @@ process_input(struct ccnd_handle *h, int fd)
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
 		ccnd_msg(h,"process input udl");
 		tmpbuf = pcap_next(face->pcap_handle, &header);
-		ccnd_msg(h,"process input udl complete");
+		ccnd_msg(h,"process input udl complete tmpbuf %s header.len %d", tmpbuf, header.len);
 		memcpy(buf, tmpbuf, header.len);
 		res = header.len;
 		if (res == 60){
