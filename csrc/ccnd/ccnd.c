@@ -5365,8 +5365,17 @@ ccnd_send(struct ccnd_handle *h,
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
 		ccnd_msg(h,"(face->flags & CCN_FACE_UDL) != 0 eth: %s, ethid: %d", face->eth, face->raw_addr->sll_ifindex);
 		unsigned char sourceMAC[ETH_ALEN];
-		char* eth;
-		get_iface_name(face->recv_fd,int face->raw_addr->sll_ifindex,eth)
+		//get the name of eth from ethid
+		struct ifreq ifr;
+		memset(&ifr, 0, sizeof(ifr));
+    	ifr.ifr_ifindex = ifr.ifr_ifindex;
+    	if (ioctl(face->recv_fd, SIOCSIFNAME, &ifr) == -1)
+    	{
+       		return;
+    	}
+		printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
+
+		get_iface_name(face->recv_fd,int face->raw_addr->sll_ifindex, ifr)
 		lookup_SourceMAC(face->recv_fd, eth, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
@@ -6290,20 +6299,6 @@ int get_iface_index(int fd, const char* interface_name)
     }
 	printf("get_iface_index: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
     return ifr.ifr_ifindex;
-}
-
-int get_iface_name(int fd, int ethid, char*& eth)
-{
-    struct ifreq ifr;
-    memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_ifindex = ethid;
-    if (ioctl(fd, SIOCSIFNAME, &ifr) == -1)
-    {
-        return (-1);
-    }
-	eth = ifr.ifr_name;
-	printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
-    return 0;
 }
 
 
