@@ -586,6 +586,8 @@ void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *, int , char* 
 void insert_pcap_handle_list(struct ccn_pcap_handle_list *, pcap_t *, char* );
 
 int get_iface_index(int , const char* );
+int get_iface_name(int, int, char*&);
+
 int set_promisc(struct ccnd_handle *, int fd, char* );
 void lookup_SourceMAC(int, char* , char* );
 

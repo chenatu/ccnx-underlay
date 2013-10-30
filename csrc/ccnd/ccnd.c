@@ -2945,7 +2945,7 @@ Underlay:
             init_face_flags(h, newface, setflags);
             newface->flags |= CCN_FACE_GG;
             res = enroll_face(h, newface);
-			ccnd_msg(h,"newface eth: %s fd: %d id: %d", newface->eth, newface->recv_fd, newface->faceid);
+			ccnd_msg(h,"newface eth: %s fd: %d", newface->eth, newface->recv_fd);
             if (res == -1) {
                 hashtb_delete(e);
                 newface = NULL;
@@ -5363,17 +5363,16 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		ccnd_msg(h,"face->flags & CCN_FACE_UDL) != 0 eth: %s, ethid: %d", face->eth, face->raw_addr->sll_ifindex);
+		ccnd_msg(h,"(face->flags & CCN_FACE_UDL) != 0 eth: %s, ethid: %d", face->eth, face->raw_addr->sll_ifindex);
 		unsigned char sourceMAC[ETH_ALEN];
-		ccnd_msg(h,"---0---");
-		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
-		ccnd_msg(h,"---1---");
+		char* eth;
+		get_iface_name(face->recv_fd,int face->raw_addr->sll_ifindex,eth)
+		lookup_SourceMAC(face->recv_fd, eth, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
-		ccnd_msg(h,"---2---");
 		//This public MAC address is for broadcast
 		unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 		memcpy(buffer, broaddest, 6);
@@ -6289,9 +6288,24 @@ int get_iface_index(int fd, const char* interface_name)
     {
         return (-1);
     }
-	printf("get_iface_index: eth %s, ethid %d", ifr.ifr_name, ifr.ifr_ifindex);
+	printf("get_iface_index: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
     return ifr.ifr_ifindex;
 }
+
+int get_iface_name(int fd, int ethid, char*& eth)
+{
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    ifr.ifr_ifindex = ethid;
+    if (ioctl(fd, SIOCSIFNAME, &ifr) == -1)
+    {
+        return (-1);
+    }
+	eth = ifr.ifr_name;
+	printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
+    return 0;
+}
+
 
 int set_promisc(struct ccnd_handle *h, int fd, char* eth){
 	struct ifreq ifr;
