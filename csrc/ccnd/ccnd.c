@@ -5368,7 +5368,7 @@ ccnd_send(struct ccnd_handle *h,
 		//get the name of eth from ethid
 		struct ifreq ifr;
 		memset(&ifr, 0, sizeof(ifr));
-    	ifr.ifr_ifindex = ifr.ifr_ifindex;
+    	ifr.ifr_ifindex = face->raw_addr->sll_ifindex;
 		int res = ioctl(face->recv_fd, SIOCGIFNAME, &ifr);
     	if (res == -1)
     	{
