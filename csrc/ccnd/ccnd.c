@@ -5369,9 +5369,11 @@ ccnd_send(struct ccnd_handle *h,
 		struct ifreq ifr;
 		memset(&ifr, 0, sizeof(ifr));
     	ifr.ifr_ifindex = ifr.ifr_ifindex;
-    	if (ioctl(face->recv_fd, SIOCSIFNAME, &ifr) == -1)
+		int res = ioctl(face->recv_fd, SIOCGIFNAME, &ifr);
+    	if (res == -1)
     	{
-       		return;
+			ccnd_msg(h,"look up name failed res == %d", res);
+			return;
     	}
 		printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
 
