@@ -5104,7 +5104,7 @@ process_input(struct ccnd_handle *h, int fd)
 		res = header.len;
 		if (res == 60){
 			//ccnd_msg(h, "length is 60");
-			while (buf[res-1]==0x00) tmpres--;
+			while (buf[res-1]==0x00) res--;
 			res += 2;
 		}
 		/*res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
