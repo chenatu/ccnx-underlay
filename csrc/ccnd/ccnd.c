@@ -5383,7 +5383,7 @@ ccnd_send(struct ccnd_handle *h,
 		lookup_SourceMAC(face->recv_fd, ifr.ifr_name, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
-		ccnd_msg("before MAC size: %d", size);
+		ccnd_msg(h, "before MAC size: %d", size);
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
