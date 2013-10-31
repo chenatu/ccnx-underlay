@@ -5397,7 +5397,7 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy((buffer+2+(2*6)), data, size	);
 		ccnd_msg(h,"---4---");
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
-		ccnd_msg(h, "ccnd_send udl buffer: %s size: %d", buffer, bufferlen);
+		ccnd_msg(h, "ccnd_send udl buffer: %s size: %d res: %d", buffer, bufferlen, res);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
