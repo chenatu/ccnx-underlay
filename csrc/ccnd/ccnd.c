@@ -5099,7 +5099,7 @@ process_input(struct ccnd_handle *h, int fd)
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
 		ccnd_msg(h,"process input udl");
 		tmpbuf = pcap_next(face->pcap_handle, &header);
-		ccnd_msg(h,"process input udl complete tmpbuf %s header.len %d", tmpbuf, header.len);
+		ccnd_msg(h,"process input udl complete header.len %d", header.len);
 		//14 is the length of MAC header
 		memcpy(buf, tmpbuf+14, header.len-14);
 		res = header.len-14;
