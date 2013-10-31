@@ -5383,7 +5383,7 @@ ccnd_send(struct ccnd_handle *h,
 		lookup_SourceMAC(face->recv_fd, ifr.ifr_name, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
-		ccnd_msg(h, "before MAC size: %d", size);
+		ccnd_msg(h, "before MAC size: %d buffer:%s", size, buffer);
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
@@ -5397,7 +5397,7 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy((buffer+2+(2*6)), data, size	);
 		ccnd_msg(h,"---4---");
 		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
-		ccnd_msg(h, "ccnd_send udl buffer: %s size: %d res: %d", buffer, bufferlen, res);
+		ccnd_msg(h, "ccnd_send udl buffer: %s, size: %d, res: %d", buffer, bufferlen, res);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
         res = send(face->recv_fd, data, size, 0);
