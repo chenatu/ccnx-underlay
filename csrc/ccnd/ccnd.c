@@ -5100,9 +5100,10 @@ process_input(struct ccnd_handle *h, int fd)
 		ccnd_msg(h,"process input udl");
 		tmpbuf = pcap_next(face->pcap_handle, &header);
 		ccnd_msg(h,"process input udl complete tmpbuf %s header.len %d", tmpbuf, header.len);
-		memcpy(buf, tmpbuf, header.len);
-		res = header.len;
-		if (res == 60){
+		//14 is the length of MAC header
+		memcpy(buf, tmpbuf+14, header.len-14);
+		res = header.len-14;
+		if (res == 46){
 			//ccnd_msg(h, "length is 60");
 			while (buf[res-1]==0x00) res--;
 			res += 2;
