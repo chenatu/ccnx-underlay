@@ -5101,10 +5101,10 @@ process_input(struct ccnd_handle *h, int fd)
 		tmpbuf = pcap_next(face->pcap_handle, &header);
 		ccnd_msg(h,"process input udl complete tmpbuf %s header.len %d", tmpbuf, header.len);
 		//14 is the length of MAC header
-		memcpy(buf, tmpbuf+14, header.len-14);
-		res = header.len-14;
-		if (res == 46){
-			//ccnd_msg(h, "length is 60");
+		memcpy(buf, tmpbuf+14, header.len-30);
+		res = header.len-30;
+		if (res == 30){
+			ccnd_msg(h, "length is 30");
 			while (buf[res-1]==0x00) res--;
 			res += 2;
 		}
@@ -5383,6 +5383,7 @@ ccnd_send(struct ccnd_handle *h,
 		lookup_SourceMAC(face->recv_fd, ifr.ifr_name, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
+		ccnd_msg("before MAC size: %d", size);
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
 		memset(buffer, 0, bufferlen);
