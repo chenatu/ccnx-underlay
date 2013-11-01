@@ -250,17 +250,20 @@ main(int argc, char **argv)
     if (ccn_connect(ccn, NULL) == -1) {
         perror("Could not connect to ccnd");
         exit(1);
-    }
+    } else{
+		printf("Connect to ccnd\n");
+	}
 
     /* Read the actual user data from standard input */
     buf = calloc(1, blocksize);
     read_res = read_full(0, buf, blocksize);
+	
     if (read_res < 0) {
         perror("read");
         read_res = 0;
         status = 1;
     }
-        
+    printf("Read data complete\n");
     /* Tack on the version component if requested */
     if (versioned) {
         res = ccn_create_version(ccn, name, CCN_V_REPLACE | CCN_V_NOW | CCN_V_HIGH, 0, 0);
@@ -370,6 +373,7 @@ main(int argc, char **argv)
     else {
         in_interest.data = temp;
         /* Set up a handler for interests */
+		printf(" Set up a handler for interests\n")
         res = ccn_set_interest_filter(ccn, pname, &in_interest);
         if (res < 0) {
             fprintf(stderr, "Failed to register interest (res == %d)\n", res);

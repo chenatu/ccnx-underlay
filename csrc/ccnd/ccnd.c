@@ -5104,7 +5104,7 @@ process_input(struct ccnd_handle *h, int fd)
 		memcpy(buf, tmpbuf+14, header.len-14);
 		res = header.len-14;
 		if (res == 46){
-			ccnd_msg(h, "length is 30");
+			ccnd_msg(h, "length is 46");
 			while (buf[res-1]==0x00) res--;
 			res += 2;
 		}
