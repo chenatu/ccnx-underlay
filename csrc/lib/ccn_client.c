@@ -1115,6 +1115,7 @@ ccn_pushout(struct ccn *h)
 int
 ccn_put(struct ccn *h, const void *p, size_t length)
 {
+	printf("ccn_put\n");
     struct ccn_skeleton_decoder dd = {0};
     ssize_t res;
     if (h == NULL)
@@ -1729,7 +1730,7 @@ ccn_dispatch_message(struct ccn *h, unsigned char *msg, size_t size)
 static int
 ccn_process_input(struct ccn *h)
 {
-    //printf("call ccn_process_input\n");
+    printf("call ccn_process_input\n");
     ssize_t res;
     ssize_t msgstart;
     unsigned char *buf;
@@ -1741,6 +1742,7 @@ ccn_process_input(struct ccn *h)
         memset(d, 0, sizeof(*d));
     buf = ccn_charbuf_reserve(inbuf, 8800);
     res = read(h->sock, buf, inbuf->limit - inbuf->length);
+	printf("read %s, length %d", buf, inbuf->limit - inbuf->length);
     if (res == 0) {
         ccn_disconnect(h);
         return(-1);
