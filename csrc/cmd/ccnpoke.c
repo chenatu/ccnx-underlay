@@ -373,7 +373,7 @@ main(int argc, char **argv)
     else {
         in_interest.data = temp;
         /* Set up a handler for interests */
-		printf(" Set up a handler for interests\n")
+		printf(" Set up a handler for interests\n");
         res = ccn_set_interest_filter(ccn, pname, &in_interest);
         if (res < 0) {
             fprintf(stderr, "Failed to register interest (res == %d)\n", res);
