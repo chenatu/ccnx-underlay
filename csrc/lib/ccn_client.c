@@ -1099,6 +1099,7 @@ ccn_pushout(struct ccn *h)
             return(1);
         size = h->outbuf->length - h->outbufindex;
         res = write(h->sock, h->outbuf->buf + h->outbufindex, size);
+		printf("1 write: %s, length %d\n", h->outbuf->buf + h->outbufindex, size);
         if (res == size) {
             h->outbuf->length = h->outbufindex = 0;
             return(0);
@@ -1140,6 +1141,7 @@ ccn_put(struct ccn *h, const void *p, size_t length)
         res = 0;
     else
         res = write(h->sock, p, length);
+		printf("2 write: %s, length %d\n", p, length);
     if (res == length)
         return(0);
     if (res == -1) {
