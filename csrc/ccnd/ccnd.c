@@ -4205,6 +4205,7 @@ propagate_interest(struct ccnd_handle *h,
     if (ie->ev == NULL)
         ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, expiry);
 Bail:
+	ccnd_msg(h, "get_outbound_faces NULL");
     hashtb_end(e);
     ccn_indexbuf_destroy(&outbound);
     return(res);
