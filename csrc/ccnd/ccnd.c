@@ -4167,7 +4167,10 @@ propagate_interest(struct ccnd_handle *h,
     }
     lifetime = ccn_interest_lifetime(msg, pi);
     outbound = get_outbound_faces(h, face, msg, pi, npe);
-    if (outbound == NULL) goto Bail;
+    if (outbound == NULL){
+		ccnd_msg(h, "get_outbound_faces NULL");
+		goto Bail;
+    }
     nonce = msg + pi->offset[CCN_PI_B_Nonce];
     noncesize = pi->offset[CCN_PI_E_Nonce] - pi->offset[CCN_PI_B_Nonce];
     if (noncesize != 0)
@@ -4210,7 +4213,6 @@ propagate_interest(struct ccnd_handle *h,
     if (ie->ev == NULL)
         ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, expiry);
 Bail:
-	ccnd_msg(h, "get_outbound_faces NULL");
     hashtb_end(e);
     ccn_indexbuf_destroy(&outbound);
     return(res);
