@@ -3433,6 +3433,7 @@ get_outbound_faces(struct ccnd_handle *h,
     struct ccn_parsed_interest *pi,
     struct nameprefix_entry *npe)
 {
+	ccnd_msg(h, "get_outbound_faces");
     int checkmask = 0;
     int wantmask = 0;
     struct ccn_indexbuf *x;
@@ -3470,6 +3471,7 @@ get_outbound_faces(struct ccnd_handle *h,
     wantmask = checkmask;
     if (wantmask == CCN_FACE_GG)
         checkmask |= CCN_FACE_DC;
+	ccnd_msg(h, "1 get_outbound_faces");
     for (n = npe->forward_to->n, i = 0; i < n; i++) {
         faceid = npe->forward_to->buf[i];
         face = face_from_faceid(h, faceid);
@@ -3480,6 +3482,7 @@ get_outbound_faces(struct ccnd_handle *h,
             ccn_indexbuf_append_element(x, face->faceid);
         }
     }
+	ccnd_msg(h, "2 get_outbound_faces")
     return(x);
 }
 
