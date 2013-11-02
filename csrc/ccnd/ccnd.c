@@ -3475,11 +3475,13 @@ get_outbound_faces(struct ccnd_handle *h,
     for (n = npe->forward_to->n, i = 0; i < n; i++) {
         faceid = npe->forward_to->buf[i];
         face = face_from_faceid(h, faceid);
+		ccnd_msg(h,"faceid %d", faceid);
         if (face != NULL && face != from &&
             ((face->flags & checkmask) == wantmask)) {
             if (h->debug & 32)
                 ccnd_msg(h, "outbound.%d adding %u", __LINE__, face->faceid);
             ccn_indexbuf_append_element(x, face->faceid);
+			ccnd_msg(h,"append faceid %d", face->faceid);
         }
     }
 	ccnd_msg(h, "2 get_outbound_faces");
