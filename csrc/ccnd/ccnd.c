@@ -3821,7 +3821,7 @@ do_propagate(struct ccn_schedule *sched,
             if (d[i]->faceid != p->faceid)
                 break;
         if (i < n) {
-            //ccnd_msg(h,"forward interest: %s, face: %d", ie->interest_msg, p->faceid);
+            ccnd_msg(h,"forward interest: %s, to face: %d", ie->interest_msg, p->faceid);
             p = send_interest(h, ie, d[i], p);
             upstreams++;
             rem = p->expiry - now;
@@ -3830,12 +3830,14 @@ do_propagate(struct ccn_schedule *sched,
         }
         else {
             /* Upstream expired, but we have nothing to feed it. */
+			ccnd_msg(h,"else");
             p->pfi_flags |= CCND_PFI_UPHUNGRY;
         }
     }
     if (pending == 0 && upstreams == 0) {
         strategy_callout(h, ie, CCNST_TIMEOUT);
         consume_interest(h, ie);
+		ccnd_msg(h,"do_propagate return 1");
         return(0);
     }
     /* Determine when we need to run again */
@@ -3843,6 +3845,7 @@ do_propagate(struct ccn_schedule *sched,
     next_delay = mn * (1000000 / WTHZ);
     ev->evint = h->wtnow + mn;
     ie->ev = ev;
+	ccnd_msg(h,"do_propagate return 2");
     return(next_delay);
 }
 
