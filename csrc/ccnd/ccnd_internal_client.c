@@ -841,6 +841,7 @@ ccnd_req_guest(struct ccn_closure *selfp,
                enum ccn_upcall_kind kind,
                struct ccn_upcall_info *info)
 {
+	printf("ccnd_req_guest\n");
     struct ccnd_handle *ccnd = selfp->data;
     struct hashtb_enumerator ee;
     struct ccn_signing_params sp = CCN_SIGNING_PARAMS_INIT;

@@ -3574,7 +3574,8 @@ send_interest(struct ccnd_handle *h, struct interest_entry *ie,
     p->pfi_flags &= ~(CCND_PFI_SENDUPST | CCND_PFI_UPHUNGRY);
     ccnd_meter_bump(h, face->meter[FM_INTO], 1);
     stuff_and_send(h, face, ie->interest_msg, ie->size - 1, c->buf, c->length, (h->debug & 2) ? "interest_to" : NULL, __LINE__);
-    return(p);
+	ccnd_msg(h, "send_interest from %d to %d", x->faceid, p->faceid);
+	return(p);
 }
 
 /**
@@ -3744,7 +3745,7 @@ do_propagate(struct ccn_schedule *sched,
     struct pit_face_item *p = NULL;
     struct pit_face_item *next = NULL;
     struct pit_face_item *d[3] = { NULL, NULL, NULL };
-    ccn_wrappedtime now;
+	ccn_wrappedtime now;
     int next_delay;
     int i;
     int n;
@@ -3753,7 +3754,7 @@ do_propagate(struct ccn_schedule *sched,
     unsigned life;
     unsigned mn;
     unsigned rem;
-    
+    ccnd_msg(h,"do_propagate");
     if (ie->ev == ev)
         ie->ev = NULL;
     if (flags & CCN_SCHEDULE_CANCEL)
