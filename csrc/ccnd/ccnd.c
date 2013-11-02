@@ -3482,7 +3482,7 @@ get_outbound_faces(struct ccnd_handle *h,
             ccn_indexbuf_append_element(x, face->faceid);
         }
     }
-	ccnd_msg(h, "2 get_outbound_faces")
+	ccnd_msg(h, "2 get_outbound_faces");
     return(x);
 }
 
