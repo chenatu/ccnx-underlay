@@ -4213,6 +4213,7 @@ propagate_interest(struct ccnd_handle *h,
         ccn_schedule_cancel(h->sched, ie->ev);
     if (ie->ev == NULL){
         ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, expiry);
+		ccnd_msg(h,"---2---");
 		ccnd_msg(h, "ccn_schedule_event do_propagate faceid1:%d, faceid2:%d", ie->pfl->faceid, ie->pfl->next->faceid);
     }
 Bail:
