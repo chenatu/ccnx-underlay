@@ -3462,7 +3462,6 @@ get_outbound_faces(struct ccnd_handle *h,
     }
     if (npe->forward_to == NULL || npe->forward_to->n == 0)
         return(x);
-	ccnd_msg(h,"---1---");
     if ((npe->flags & CCN_FORW_LOCAL) != 0)
         checkmask = (from != NULL && (from->flags & CCN_FACE_GG) != 0) ? CCN_FACE_GG : (~0);
     else if (pi->scope == 1)
@@ -4213,8 +4212,7 @@ propagate_interest(struct ccnd_handle *h,
         ccn_schedule_cancel(h->sched, ie->ev);
     if (ie->ev == NULL){
         ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, expiry);
-		ccnd_msg(h,"---2---");
-		ccnd_msg(h, "ccn_schedule_event do_propagate faceid1:%d, faceid2:%d", ie->pfl->faceid, ie->pfl->next->faceid);
+		ccnd_msg(h, "ccn_schedule_event do_propagate faceid1:%d", ie->pfl->faceid);
     }
 Bail:
     hashtb_end(e);
