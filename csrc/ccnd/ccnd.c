@@ -3460,9 +3460,9 @@ get_outbound_faces(struct ccnd_handle *h,
             return(x);
         }
     }
-	ccnd_msg(h,"---1---");
     if (npe->forward_to == NULL || npe->forward_to->n == 0)
         return(x);
+	ccnd_msg(h,"---1---");
     if ((npe->flags & CCN_FORW_LOCAL) != 0)
         checkmask = (from != NULL && (from->flags & CCN_FACE_GG) != 0) ? CCN_FACE_GG : (~0);
     else if (pi->scope == 1)
