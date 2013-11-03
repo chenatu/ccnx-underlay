@@ -3460,6 +3460,7 @@ get_outbound_faces(struct ccnd_handle *h,
             return(x);
         }
     }
+	ccnd_msg(h,"---1---");
     if (npe->forward_to == NULL || npe->forward_to->n == 0)
         return(x);
     if ((npe->flags & CCN_FORW_LOCAL) != 0)
