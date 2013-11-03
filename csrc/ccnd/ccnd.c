@@ -4236,7 +4236,7 @@ update_npe_children(struct ccnd_handle *h, struct nameprefix_entry *npe, unsigne
     struct ccn_indexbuf *ob = NULL;
     int i;
     unsigned usec = 6000; /*  a bit of time for prefix reg  */
-
+	ccnd_msg(h, "update_npe_children");
     hashtb_start(h->interest_tab, e);
     for (ie = e->data; ie != NULL; ie = e->data) {
         for (x = ie->ll.npe; x != NULL; x = x->parent) {
@@ -4267,7 +4267,10 @@ update_npe_children(struct ccnd_handle *h, struct nameprefix_entry *npe, unsigne
                                     ccn_schedule_cancel(h->sched, ie->ev);
                                 if (ie->ev == NULL)
                                     ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, p->expiry);
-                            }
+								for (p = ie->pfl; p != NULL; p = p->next) {
+									ccnd_msg(h, "ccn_schedule_event faceid: %d pending msg: %s", ie->pfl->faceid, ie->interest_msg);
+								}
+							}
                             break;
                         }
                     }
