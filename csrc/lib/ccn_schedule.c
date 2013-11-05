@@ -317,7 +317,8 @@ ccn_schedule_run_next(struct ccn_schedule *sched)
 int
 ccn_schedule_run(struct ccn_schedule *sched)
 {
-    heapmicros ans;
+	printf("ccn_schedule_run\n");
+	heapmicros ans;
     do {
         while (sched->heap_n > 0 && sched->heap[0].event_time <= sched->now)
             ccn_schedule_run_next(sched);

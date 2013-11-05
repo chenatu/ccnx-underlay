@@ -5041,7 +5041,7 @@ process_input_buffer(struct ccnd_handle *h, struct face *face)
     size_t size;
     ssize_t dres;
     struct ccn_skeleton_decoder *d;
-
+	ccnd_msg(h,"process_input_buffer");
     if (face == NULL || face->inbuf == NULL)
         return;
     d = &face->decoder;
@@ -5250,6 +5250,7 @@ process_input(struct ccnd_handle *h, int fd)
 static void
 process_internal_client_buffer(struct ccnd_handle *h)
 {
+	ccnd_msg(h, "process_internal_client_buffer");
     struct face *face = h->face0;
     if (face == NULL)
         return;
@@ -5558,7 +5559,8 @@ prepare_poll_fds(struct ccnd_handle *h)
 void
 ccnd_run(struct ccnd_handle *h)
 {
-    int i;
+	ccnd_msg(h, "ccnd_run");
+	int i;
     int res;
     int timeout_ms = -1;
     int prev_timeout_ms = -1;
