@@ -4142,7 +4142,7 @@ propagate_interest(struct ccnd_handle *h,
     int i;
     int res;
     int usec;
-    
+    ccnd_msg(h, "propagate_interest");
     faceid = face->faceid;
     hashtb_start(h->interest_tab, e);
     res = hashtb_seek(e, msg, pi->offset[CCN_PI_B_InterestLifetime], 1);
@@ -4212,7 +4212,9 @@ propagate_interest(struct ccnd_handle *h,
         ccn_schedule_cancel(h->sched, ie->ev);
     if (ie->ev == NULL){
         ie->ev = ccn_schedule_event(h->sched, usec, do_propagate, ie, expiry);
-		ccnd_msg(h, "ccn_schedule_event do_propagate faceid1:%d", ie->pfl->faceid);
+		for (p = ie->pfl; p != NULL; p = p->next) {
+			ccnd_msg(h, "ccn_schedule_event faceid: %d pending msg: %s", ie->pfl->faceid, ie->interest_msg);
+		}
     }
 Bail:
     hashtb_end(e);
