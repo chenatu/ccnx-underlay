@@ -5088,7 +5088,7 @@ process_input(struct ccnd_handle *h, int fd)
     int err = 0;
     socklen_t err_sz;
     struct pcap_pkthdr header;	/* The header that pcap gives us */
-	
+	ccnd_msg(h, "process_input");
     face = hashtb_lookup(h->faces_by_fd, &fd, sizeof(fd));
     if (face == NULL)
         return;

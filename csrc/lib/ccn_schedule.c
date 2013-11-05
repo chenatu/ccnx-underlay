@@ -282,7 +282,7 @@ ccn_schedule_cancel(struct ccn_schedule *sched, struct ccn_scheduled_event *ev)
 static void
 ccn_schedule_run_next(struct ccn_schedule *sched)
 {
-    struct ccn_scheduled_event *ev;
+	struct ccn_scheduled_event *ev;
     heapmicros late;
     int res;
     if (sched->heap_n == 0) return;
@@ -291,6 +291,7 @@ ccn_schedule_run_next(struct ccn_schedule *sched)
     late = sched->now - sched->heap[0].event_time;
     heap_sift(sched->heap, sched->heap_n--);
     res = (ev->action)(sched, sched->clienth, ev, 0);
+	printf("ccn_schedule_run_next\n");
     if (res <= 0) {
         free(ev);
         return;
