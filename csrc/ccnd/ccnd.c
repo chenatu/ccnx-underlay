@@ -5596,6 +5596,11 @@ ccnd_run(struct ccnd_handle *h)
                     }
                     else
                         shutdown_client_fd(h, h->fds[i].fd);
+					//Change the schedule order
+					usec = ccn_schedule_run(h->sched);
+	        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
+	        		if (timeout_ms == 0 && prev_timeout_ms == 0)
+	            		timeout_ms = 1;
                     continue;
                 }
                 if (h->fds[i].revents & (POLLOUT))
