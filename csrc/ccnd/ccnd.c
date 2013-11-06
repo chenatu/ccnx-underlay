@@ -5591,7 +5591,7 @@ ccnd_run(struct ccnd_handle *h)
                 res--;
                 if (h->fds[i].revents & (POLLERR | POLLNVAL | POLLHUP)) {
                     if (h->fds[i].revents & (POLLIN)){
-                        //ccnd_msg(h,"POLLIN fd: %d", h->fds[i].fd);  
+                        ccnd_msg(h,"1 POLLIN fd: %d", h->fds[i].fd);  
                         process_input(h, h->fds[i].fd);
                     }
                     else
@@ -5600,8 +5600,10 @@ ccnd_run(struct ccnd_handle *h)
                 }
                 if (h->fds[i].revents & (POLLOUT))
                     do_deferred_write(h, h->fds[i].fd);
-                else if (h->fds[i].revents & (POLLIN))
+                else if (h->fds[i].revents & (POLLIN)){
+					ccnd_msg(h,"2 POLLIN fd: %d", h->fds[i].fd); 
                     process_input(h, h->fds[i].fd);
+                }
             }
         }
     }
