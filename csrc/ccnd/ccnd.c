@@ -90,7 +90,7 @@ static struct face *record_connection(struct ccnd_handle *h,
                                       int setflags);
 static void process_input_message(struct ccnd_handle *h, struct face *face,
                                   unsigned char *msg, size_t size, int pdu_ok);
-static void process_input(struct ccnd_handle *h, int fd);
+static void process_input(struct ccnd_handle *h, int fd, int fds_index);
 static int ccn_stuff_interest(struct ccnd_handle *h,
                               struct face *face, struct ccn_charbuf *c);
 static void do_deferred_write(struct ccnd_handle *h, int fd);
@@ -5071,7 +5071,7 @@ process_input_buffer(struct ccnd_handle *h, struct face *face)
  * process_input_message for each one.
  */
 static void
-process_input(struct ccnd_handle *h, int fd)
+process_input(struct ccnd_handle *h, int fd, int fds_index)
 {
     struct face *face = NULL;
     struct face *source = NULL;
@@ -5137,6 +5137,7 @@ process_input(struct ccnd_handle *h, int fd)
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
 		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
+		h->fds[i].revents = 0;
 	}
     else{
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
@@ -5592,28 +5593,28 @@ ccnd_run(struct ccnd_handle *h)
                 if (h->fds[i].revents & (POLLERR | POLLNVAL | POLLHUP)) {
                     if (h->fds[i].revents & (POLLIN)){
                         ccnd_msg(h,"1 POLLIN fd: %d", h->fds[i].fd);  
-                        process_input(h, h->fds[i].fd);
+                        process_input(h, h->fds[i].fd, i);
                     }
                     else
                         shutdown_client_fd(h, h->fds[i].fd);
 					//Change the schedule order
-					usec = ccn_schedule_run(h->sched);
-	        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
-	        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-	            		timeout_ms = 1;
+					/*usec = ccn_schedule_run(h->sched);
+		        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
+		        		if (timeout_ms == 0 && prev_timeout_ms == 0)
+		            		timeout_ms = 1;*/
                     continue;
                 }
                 if (h->fds[i].revents & (POLLOUT))
                     do_deferred_write(h, h->fds[i].fd);
                 else if (h->fds[i].revents & (POLLIN)){
 					ccnd_msg(h,"2 POLLIN fd: %d, res: %d, i: %d", h->fds[i].fd, res, i); 
-                    process_input(h, h->fds[i].fd);
+                    process_input(h, h->fds[i].fd, i);
                 }
 				//Change the schedule order
-				usec = ccn_schedule_run(h->sched);
-        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
-        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-            		timeout_ms = 1;
+				/*usec = ccn_schedule_run(h->sched);
+	        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
+	        		if (timeout_ms == 0 && prev_timeout_ms == 0)
+	            		timeout_ms = 1;*/
             }
         }
     }
