@@ -5137,7 +5137,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
 		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
-		h->fds[i].revents = 0;
+		h->fds[i].revents = h->fds[i].revents - POLLIN;
 	}
     else{
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
