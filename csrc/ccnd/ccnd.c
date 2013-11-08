@@ -5138,14 +5138,14 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
 		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
 		//h->fds[fds_index].revents = h->fds[fds_index].revents - POLLIN;
-		if(h->fds[fds_index].revents & POLLIN){
-			ccnd_msg(h, "still POLLIN");
-		}
 	}
     else{
 		res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
             /* flags */ 0, addr, &addrlen);
     }
+	if(h->fds[fds_index].revents & POLLIN){
+		ccnd_msg(h, "still POLLIN");
+	}
 	ccnd_msg(h, "recvfrom face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
     if (res == -1)
         ccnd_msg(h, "recvfrom face %u :%s (errno = %d)",
