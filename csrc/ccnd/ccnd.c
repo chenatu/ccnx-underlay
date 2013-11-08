@@ -5145,6 +5145,8 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
     }
 	if(h->fds[fds_index].revents & POLLIN){
 		ccnd_msg(h, "still POLLIN");
+	} else {
+		ccnd_msg(h, "not POLLIN");
 	}
 	ccnd_msg(h, "recvfrom face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
     if (res == -1)
