@@ -3773,7 +3773,7 @@ do_propagate(struct ccn_schedule *sched,
 		ccnd_msg(h,"p->faceid: %d, flags: %x",p->faceid, p->pfi_flags);
         if ((p->pfi_flags & CCND_PFI_DNSTREAM) != 0) {
 			ccnd_msg(h,"(p->pfi_flags & CCND_PFI_DNSTREAM) != 0");
-            if (wt_compare(p->expiry, now) <= 0) {
+            /*if (wt_compare(p->expiry, now) <= 0) {
                 if (h->debug & 2)
                     ccnd_debug_ccnb(h, __LINE__, "interest_expiry",
                                     face_from_faceid(h, p->faceid),
@@ -3781,7 +3781,7 @@ do_propagate(struct ccn_schedule *sched,
 				ccnd_msg(h, "interest_expiry");
                 pfi_destroy(h, ie, p);
                 continue;
-            }
+            }*/
             if ((p->pfi_flags & CCND_PFI_PENDING) == 0){
 				ccnd_msg(h,"not pending");
                 continue;
@@ -3792,12 +3792,13 @@ do_propagate(struct ccn_schedule *sched,
             pending++;
             /* If this downstream will expire soon, don't use it */
             life = p->expiry - p->renewed;
-            if (rem * 8 <= life){
+            /*if (rem * 8 <= life){
 				ccnd_msg(h,"rem:%d * 8 <= life:%d", rem, life);
                 continue;
-            }
+            }*/
             /* keep track of the 2 longest-lasting downstreams */
-            for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
+            //for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
+			for (i = n; i > 0; i--)
                 d[i] = d[i-1];
             d[i] = p;
             if (n < 2)
