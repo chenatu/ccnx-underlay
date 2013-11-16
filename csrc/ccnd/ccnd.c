@@ -3772,6 +3772,7 @@ do_propagate(struct ccn_schedule *sched,
         next = p->next;
 		ccnd_msg(h,"p->faceid: %d, flags: %x",p->faceid, p->pfi_flags);
         if ((p->pfi_flags & CCND_PFI_DNSTREAM) != 0) {
+			ccnd_msg(h,"(p->pfi_flags & CCND_PFI_DNSTREAM) != 0");
             if (wt_compare(p->expiry, now) <= 0) {
                 if (h->debug & 2)
                     ccnd_debug_ccnb(h, __LINE__, "interest_expiry",
@@ -3781,6 +3782,7 @@ do_propagate(struct ccn_schedule *sched,
                 continue;
             }
             if ((p->pfi_flags & CCND_PFI_PENDING) == 0)
+				ccnd_msg(h,"not pending");
                 continue;
             rem = p->expiry - now;
             if (rem < mn)
@@ -3796,6 +3798,7 @@ do_propagate(struct ccn_schedule *sched,
                 d[i] = d[i-1];
             d[i] = p;
             if (n < 2)
+				ccnd_msg(h,"n++");
                 n++;
         }
     }
