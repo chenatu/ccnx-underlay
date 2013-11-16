@@ -3858,7 +3858,10 @@ do_propagate(struct ccn_schedule *sched,
         return(0);
     }
     /* Determine when we need to run again */
-    if (mn == 0) abort();
+    if (mn == 0){
+		ccnd_msg(h, "abort");
+		abort();
+    }
     next_delay = mn * (1000000 / WTHZ);
     ev->evint = h->wtnow + mn;
     ie->ev = ev;
