@@ -3798,6 +3798,7 @@ do_propagate(struct ccn_schedule *sched,
             for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
                 d[i] = d[i-1];
             d[i] = p;
+			ccnd_msg("n:%d", n);
             if (n < 2)
 				ccnd_msg(h,"n++");
                 n++;
