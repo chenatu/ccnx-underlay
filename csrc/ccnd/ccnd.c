@@ -3789,6 +3789,7 @@ do_propagate(struct ccn_schedule *sched,
             /* If this downstream will expire soon, don't use it */
             life = p->expiry - p->renewed;
             if (rem * 8 <= life)
+				ccnd_msg(h,"rem:%d * 8 <= life:%d", rem, life);
                 continue;
             /* keep track of the 2 longest-lasting downstreams */
             for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
