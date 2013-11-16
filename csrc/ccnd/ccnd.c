@@ -3825,19 +3825,19 @@ do_propagate(struct ccn_schedule *sched,
         for (i = 0; i < n; i++)
             if (d[i]->faceid != p->faceid)
                 break;
-        if (i < n) {
+        //if (i < n) {
             ccnd_msg(h,"forward interest: %s, to face: %d", ie->interest_msg, p->faceid);
             p = send_interest(h, ie, d[i], p);
             upstreams++;
             rem = p->expiry - now;
             if (rem < mn)
                 mn = rem;
-        }
-        else {
+        //}
+        //else {
             /* Upstream expired, but we have nothing to feed it. */
-			ccnd_msg(h,"else");
-            p->pfi_flags |= CCND_PFI_UPHUNGRY;
-        }
+		//	ccnd_msg(h,"else");
+        //    p->pfi_flags |= CCND_PFI_UPHUNGRY;
+        //}
     }
     if (pending == 0 && upstreams == 0) {
         strategy_callout(h, ie, CCNST_TIMEOUT);
@@ -5603,10 +5603,10 @@ ccnd_run(struct ccnd_handle *h)
                     else
                         shutdown_client_fd(h, h->fds[i].fd);
 					//Change the schedule order
-					/*usec = ccn_schedule_run(h->sched);
+					usec = ccn_schedule_run(h->sched);
 		        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
 		        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-		            		timeout_ms = 1;*/
+		            		timeout_ms = 1;
                     continue;
                 }
                 if (h->fds[i].revents & (POLLOUT))
@@ -5616,10 +5616,10 @@ ccnd_run(struct ccnd_handle *h)
                     process_input(h, h->fds[i].fd, i);
                 }
 				//Change the schedule order
-				/*usec = ccn_schedule_run(h->sched);
+				usec = ccn_schedule_run(h->sched);
 	        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
 	        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-	            		timeout_ms = 1;*/
+	            		timeout_ms = 1;
             }
         }
     }
