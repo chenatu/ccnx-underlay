@@ -373,10 +373,10 @@ struct guest_entry {
  */
 struct pit_face_item {
     struct pit_face_item *next;     /**< next in list */
-    unsigned faceid;                /**< face id */
+    unsigned int faceid;                /**< face id */
     ccn_wrappedtime renewed;        /**< when entry was last refreshed */
     ccn_wrappedtime expiry;         /**< when entry expires */
-    unsigned pfi_flags;             /**< CCND_PFI_x */
+    unsigned int pfi_flags;             /**< CCND_PFI_x */
     unsigned char nonce[TYPICAL_NONCE_SIZE]; /**< nonce bytes */
 };
 #define CCND_PFI_NONCESZ  0x00FF    /**< Mask for actual nonce size */
