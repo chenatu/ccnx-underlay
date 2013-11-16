@@ -3823,9 +3823,9 @@ do_propagate(struct ccn_schedule *sched,
             continue;
         }
         for (i = 0; i < n; i++)
-			ccnd(h,"p->faceid: %d", p->faceid);
+			ccnd_msg(h,"p->faceid: %d", p->faceid);
             if (d[i]->faceid != p->faceid){
-				ccnd(h, "d[%d]->faceid: %d", i, d[i]->faceid);
+				ccnd_msg(h, "d[%d]->faceid: %d", i, d[i]->faceid);
                 break;
             }
         if (i < n) {
