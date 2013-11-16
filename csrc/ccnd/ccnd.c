@@ -3778,6 +3778,7 @@ do_propagate(struct ccn_schedule *sched,
                     ccnd_debug_ccnb(h, __LINE__, "interest_expiry",
                                     face_from_faceid(h, p->faceid),
                                     ie->interest_msg, ie->size);
+				ccnd_msg(h, "interest_expiry");
                 pfi_destroy(h, ie, p);
                 continue;
             }
