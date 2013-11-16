@@ -3823,8 +3823,11 @@ do_propagate(struct ccn_schedule *sched,
             continue;
         }
         for (i = 0; i < n; i++)
-            if (d[i]->faceid != p->faceid)
+			ccnd(h,"p->faceid: %d", p->faceid);
+            if (d[i]->faceid != p->faceid){
+				ccnd(h, "d[%d]->faceid: %d", i, d[i]->faceid);
                 break;
+            }
         if (i < n) {
             ccnd_msg(h,"forward interest: %s, to face: %d", ie->interest_msg, p->faceid);
             p = send_interest(h, ie, d[i], p);
@@ -3835,7 +3838,7 @@ do_propagate(struct ccn_schedule *sched,
         }
         else {
             /* Upstream expired, but we have nothing to feed it. */
-			ccnd_msg(h,"else");
+			ccnd_msg(h,"else interest: %s, to face: %d   i: %d n: %d", ie->interest_msg, p->faceid, i, n);
             p->pfi_flags |= CCND_PFI_UPHUNGRY;
         }
     }
