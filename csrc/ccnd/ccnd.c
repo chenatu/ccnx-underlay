@@ -3852,9 +3852,9 @@ do_propagate(struct ccn_schedule *sched,
         }
     }
     if (pending == 0 && upstreams == 0) {
+		ccnd_msg(h,"do_propagate return 1");
         strategy_callout(h, ie, CCNST_TIMEOUT);
         consume_interest(h, ie);
-		ccnd_msg(h,"do_propagate return 1");
         return(0);
     }
     /* Determine when we need to run again */
