@@ -3782,6 +3782,7 @@ do_propagate(struct ccn_schedule *sched,
                 pfi_destroy(h, ie, p);
                 continue;
             }
+			ccnd_msg(h,"----1----");
             if ((p->pfi_flags & CCND_PFI_PENDING) == 0)
 				ccnd_msg(h,"not pending");
                 continue;
@@ -3789,12 +3790,14 @@ do_propagate(struct ccn_schedule *sched,
             if (rem < mn)
                 mn = rem;
             pending++;
+			ccnd_msg(h,"----2----");
             /* If this downstream will expire soon, don't use it */
             life = p->expiry - p->renewed;
             if (rem * 8 <= life)
 				ccnd_msg(h,"rem:%d * 8 <= life:%d", rem, life);
                 continue;
             /* keep track of the 2 longest-lasting downstreams */
+			ccnd_msg(h,"----3----");
             for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
                 d[i] = d[i-1];
             d[i] = p;
