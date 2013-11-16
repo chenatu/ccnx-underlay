@@ -3770,6 +3770,7 @@ do_propagate(struct ccn_schedule *sched,
     n = 0;
     for (p = ie->pfl; p != NULL; p = next) {
         next = p->next;
+		ccnd_msg(h,"p->faceid: %d, flags: %x",p->faceid, p->pfi_flags);
         if ((p->pfi_flags & CCND_PFI_DNSTREAM) != 0) {
             if (wt_compare(p->expiry, now) <= 0) {
                 if (h->debug & 2)
