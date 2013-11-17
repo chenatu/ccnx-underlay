@@ -1046,7 +1046,7 @@ consume_interest(struct ccnd_handle *h, struct interest_entry *ie)
     res = hashtb_seek(e, ie->interest_msg, ie->size - 1, 1);
     if (res != HT_OLD_ENTRY){
 		ccnd_msg(h,"HT_OLD_ENTRY abort");
-        //abort();
+        abort();
     }
     hashtb_delete(e);
     hashtb_end(e);
@@ -3775,7 +3775,7 @@ do_propagate(struct ccn_schedule *sched,
 		ccnd_msg(h,"p->faceid: %d, flags: %x",p->faceid, p->pfi_flags);
         if ((p->pfi_flags & CCND_PFI_DNSTREAM) != 0) {
 			ccnd_msg(h,"(p->pfi_flags & CCND_PFI_DNSTREAM) != 0");
-            /*if (wt_compare(p->expiry, now) <= 0) {
+            if (wt_compare(p->expiry, now) <= 0) {
                 if (h->debug & 2)
                     ccnd_debug_ccnb(h, __LINE__, "interest_expiry",
                                     face_from_faceid(h, p->faceid),
@@ -3783,7 +3783,7 @@ do_propagate(struct ccn_schedule *sched,
 				ccnd_msg(h, "interest_expiry");
                 pfi_destroy(h, ie, p);
                 continue;
-            }*/
+            }
             if ((p->pfi_flags & CCND_PFI_PENDING) == 0){
 				ccnd_msg(h,"not pending");
                 continue;
@@ -3794,13 +3794,13 @@ do_propagate(struct ccn_schedule *sched,
             pending++;
             /* If this downstream will expire soon, don't use it */
             life = p->expiry - p->renewed;
-            /*if (rem * 8 <= life){
+            if (rem * 8 <= life){
 				ccnd_msg(h,"rem:%d * 8 <= life:%d", rem, life);
                 continue;
-            }*/
+            }
             /* keep track of the 2 longest-lasting downstreams */
-            //for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
-			for (i = n; i > 0; i--)
+            for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
+			//for (i = n; i > 0; i--)
                 d[i] = d[i-1];
             d[i] = p;
             if (n < 2)
@@ -3862,7 +3862,7 @@ do_propagate(struct ccn_schedule *sched,
     /* Determine when we need to run again */
     if (mn == 0){
 		ccnd_msg(h, "mn == 0 abort");
-		//abort();
+		abort();
     }
     next_delay = mn * (1000000 / WTHZ);
     ev->evint = h->wtnow + mn;
@@ -5134,16 +5134,17 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
 		ccnd_msg(h,"process input udl");
-		tmpbuf = pcap_next(face->pcap_handle, &header);
-		ccnd_msg(h,"process input udl complete header.len %d", header.len);
+		//tmpbuf = pcap_next(face->pcap_handle, &header);
+		pcap_dispatch(face->pcap_handle, 1, pcap_callback, buf);
+		//ccnd_msg(h,"process input udl complete header.len %d", header.len);
 		//14 is the length of MAC header
-		memcpy(buf, tmpbuf+14, header.len-14);
+		/*memcpy(buf, tmpbuf+14, header.len-14);
 		res = header.len-14;
 		if (res == 46){
 			ccnd_msg(h, "length is 46");
 			while (buf[res-1]==0x00) res--;
 			res += 2;
-		}
+		}*/
 		/*res = recvfrom(face->recv_fd, buf, face->inbuf->limit - face->inbuf->length,
 			0, (struct sockaddr*)(face->raw_addr), &rawaddrlen);
 		if (res == 60){
@@ -5153,7 +5154,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		}*/
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
+		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf);
 		//h->fds[fds_index].revents = h->fds[fds_index].revents - POLLIN;
 	}
     else{
@@ -5620,10 +5621,10 @@ ccnd_run(struct ccnd_handle *h)
                     else
                         shutdown_client_fd(h, h->fds[i].fd);
 					//Change the schedule order
-					usec = ccn_schedule_run(h->sched);
-		        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
-		        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-		            		timeout_ms = 1;
+					/*usec = ccn_schedule_run(h->sched);
+		        	timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
+		        	if (timeout_ms == 0 && prev_timeout_ms == 0)
+		            	timeout_ms = 1;*/
                     continue;
                 }
                 if (h->fds[i].revents & (POLLOUT))
@@ -5633,10 +5634,10 @@ ccnd_run(struct ccnd_handle *h)
                     process_input(h, h->fds[i].fd, i);
                 }
 				//Change the schedule order
-				usec = ccn_schedule_run(h->sched);
-	        		timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
-	        		if (timeout_ms == 0 && prev_timeout_ms == 0)
-	            		timeout_ms = 1;
+				/*usec = ccn_schedule_run(h->sched);
+	        	timeout_ms = (usec < 0) ? -1 : ((usec + 960) / 1000);
+	        	if (timeout_ms == 0 && prev_timeout_ms == 0)
+	            	timeout_ms = 1;*/
             }
         }
     }
@@ -6435,4 +6436,14 @@ void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_ha
 		p = p->next;
 	p->next = (struct ccn_pcap_handle_list*)calloc(1,sizeof(struct ccn_pcap_handle_list));
 }
+
+void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
+	memcpy(args, packet+14, header.len-14);
+	res = header.len-14;
+	if (res == 46){
+		while (buf[res-1]==0x00) res--;
+			res += 2;
+	}
+}
+
 

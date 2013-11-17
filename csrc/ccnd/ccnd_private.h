@@ -591,5 +591,8 @@ int get_iface_index(int , const char* );
 int set_promisc(struct ccnd_handle *, int fd, char* );
 void lookup_SourceMAC(int, char* , char* );
 
+void pcap_callback(u_char *, const struct pcap_pkthdr *, const u_char *);
+
+
 
 #endif
