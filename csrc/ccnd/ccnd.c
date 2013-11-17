@@ -5154,7 +5154,8 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		}*/
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf);
+		//ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
+		ccnd_msg(h, "pcap face %u fd %d :%s", face->faceid, face->recv_fd, buf,);
 		//h->fds[fds_index].revents = h->fds[fds_index].revents - POLLIN;
 	}
     else{
@@ -6438,10 +6439,10 @@ void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_ha
 }
 
 void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
-	memcpy(args, packet+14, header.len-14);
-	res = header.len-14;
+	memcpy(args, packet+14, header->len-14);
+	res = header->len-14;
 	if (res == 46){
-		while (buf[res-1]==0x00) res--;
+		while (args[res-1]==0x00) res--;
 			res += 2;
 	}
 }
