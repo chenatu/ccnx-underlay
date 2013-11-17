@@ -3752,7 +3752,7 @@ do_propagate(struct ccn_schedule *sched,
     struct pit_face_item *p = NULL;
     struct pit_face_item *next = NULL;
     struct pit_face_item *d[3] = { NULL, NULL, NULL };
-	ccn_wrappedtime now;
+    ccn_wrappedtime now;
     int next_delay;
     int i;
     int n;
@@ -3761,7 +3761,7 @@ do_propagate(struct ccn_schedule *sched,
     unsigned life;
     unsigned mn;
     unsigned rem;
-    ccnd_msg(h,"do_propagate");
+    
     if (ie->ev == ev)
         ie->ev = NULL;
     if (flags & CCN_SCHEDULE_CANCEL)
@@ -3772,39 +3772,30 @@ do_propagate(struct ccn_schedule *sched,
     n = 0;
     for (p = ie->pfl; p != NULL; p = next) {
         next = p->next;
-		ccnd_msg(h,"p->faceid: %d, flags: %x",p->faceid, p->pfi_flags);
         if ((p->pfi_flags & CCND_PFI_DNSTREAM) != 0) {
-			ccnd_msg(h,"(p->pfi_flags & CCND_PFI_DNSTREAM) != 0");
             if (wt_compare(p->expiry, now) <= 0) {
                 if (h->debug & 2)
                     ccnd_debug_ccnb(h, __LINE__, "interest_expiry",
                                     face_from_faceid(h, p->faceid),
                                     ie->interest_msg, ie->size);
-				ccnd_msg(h, "interest_expiry");
                 pfi_destroy(h, ie, p);
                 continue;
             }
-            if ((p->pfi_flags & CCND_PFI_PENDING) == 0){
-				ccnd_msg(h,"not pending");
+            if ((p->pfi_flags & CCND_PFI_PENDING) == 0)
                 continue;
-            }
             rem = p->expiry - now;
             if (rem < mn)
                 mn = rem;
             pending++;
             /* If this downstream will expire soon, don't use it */
             life = p->expiry - p->renewed;
-            if (rem * 8 <= life){
-				ccnd_msg(h,"rem:%d * 8 <= life:%d", rem, life);
+            if (rem * 8 <= life)
                 continue;
-            }
             /* keep track of the 2 longest-lasting downstreams */
             for (i = n; i > 0 && wt_compare(d[i-1]->expiry, p->expiry) < 0; i--)
-			//for (i = n; i > 0; i--)
                 d[i] = d[i-1];
             d[i] = p;
             if (n < 2)
-				ccnd_msg(h,"n++");
                 n++;
         }
     }
@@ -3833,16 +3824,13 @@ do_propagate(struct ccn_schedule *sched,
             upstreams++;
             continue;
         }
-		ccnd_msg(h,"p->faceid: %d  n: %d", p->faceid, n);
         for (i = 0; i < n; i++)
-            if (d[i]->faceid != p->faceid){
-				ccnd_msg(h, "d[%d]->faceid: %d", i, d[i]->faceid);
+            if (d[i]->faceid != p->faceid)
                 break;
-            }
         if (i < n) {
-            ccnd_msg(h,"forward interest: %s, to face: %d", ie->interest_msg, p->faceid);
             p = send_interest(h, ie, d[i], p);
-            upstreams++;
+			ccnd_msg(h,"forward interest: %s, to face: %d", ie->interest_msg, p->faceid);
+			upstreams++;
             rem = p->expiry - now;
             if (rem < mn)
                 mn = rem;
@@ -3854,20 +3842,15 @@ do_propagate(struct ccn_schedule *sched,
         }
     }
     if (pending == 0 && upstreams == 0) {
-		ccnd_msg(h,"do_propagate return 1");
         strategy_callout(h, ie, CCNST_TIMEOUT);
         consume_interest(h, ie);
         return(0);
     }
     /* Determine when we need to run again */
-    if (mn == 0){
-		ccnd_msg(h, "mn == 0 abort");
-		abort();
-    }
+    if (mn == 0) abort();
     next_delay = mn * (1000000 / WTHZ);
     ev->evint = h->wtnow + mn;
     ie->ev = ev;
-	ccnd_msg(h,"do_propagate return 2");
     return(next_delay);
 }
 
