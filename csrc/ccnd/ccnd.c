@@ -5429,7 +5429,7 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy((buffer+2+(2*6)), data, size	);
 		ccnd_msg(h,"---4---");
 		//res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
-		res = pcap_inject(face->handle, buffer, bufferlen);
+		res = pcap_inject(face->pcap_handle, buffer, bufferlen);
 		ccnd_msg(h, "ccnd_send udl buffer: %s, size: %d, res: %d", buffer, bufferlen, res);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
@@ -5866,7 +5866,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				if(pcap_setnonblock(handle, 1, errbuf) < 0)
 						ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
 					
-				raw_fd = pcap_get_selectable_fd();
+				raw_fd = pcap_get_selectable_fd(handle);
 
 				insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
 				if (pcap_datalink(handle) != DLT_EN10MB) {
