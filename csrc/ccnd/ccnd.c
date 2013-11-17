@@ -6440,7 +6440,7 @@ void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_ha
 
 void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 	memcpy(args, packet+14, header->len-14);
-	res = header->len-14;
+	int res = header->len-14;
 	if (res == 46){
 		while (args[res-1]==0x00) res--;
 			res += 2;
