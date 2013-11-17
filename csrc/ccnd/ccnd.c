@@ -5154,7 +5154,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
     if (res == -1)
         ccnd_msg(h, "recvfrom face %u :%s (errno = %d)",
                     face->faceid, strerror(errno), errno);
-    else if (res == 0 && (face->flags & CCN_FACE_DGRAM) == 0 (face->flags & CCN_FACE_UDL) != CCN_FACE_UDL){
+    else if (res == 0 && (face->flags & CCN_FACE_DGRAM) == 0 &&(face->flags & CCN_FACE_UDL) != CCN_FACE_UDL){
         shutdown_client_fd(h, fd);
     }
     else {
