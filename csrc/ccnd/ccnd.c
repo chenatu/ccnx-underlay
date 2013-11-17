@@ -6429,7 +6429,7 @@ void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char
 	memcpy(((struct buf*)args)->buf, packet+14, header->len-14);
 	((struct buf*)args)->len = header->len-14;
 	if (((struct buf*)args)->len == 46){
-		while (args[((struct buf*)args)->len-1]==0x00) ((struct buf*)args)->len--;
+		while (((struct buf*)args)->buf[((struct buf*)args)->len-1]==0x00) ((struct buf*)args)->len--;
 			((struct buf*)args)->len += 2;
 	}
 }
