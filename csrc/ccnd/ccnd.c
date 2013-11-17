@@ -5866,8 +5866,13 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				if(pcap_setnonblock(handle, 1, errbuf) < 0)
 						ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
 					
-				raw_fd = pcap_get_selectable_fd(handle);
+				if(raw_fd = pcap_get_selectable_fd(handle) == -1){
+					ccnd_msg(h, "get selectable fd failed");
+					return(0);
+				}
 
+				
+				usock_list->usock.sock = raw_fd;
 				insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
 				if (pcap_datalink(handle) != DLT_EN10MB) {
 					ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
@@ -5939,7 +5944,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 	                             "underlay", raw_fd, face->faceid);
 			}
 		}
-	}
     return(0);
 }
 
