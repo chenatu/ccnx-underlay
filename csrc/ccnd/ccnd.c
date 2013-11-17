@@ -5241,7 +5241,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
         }
         else if (d->state < 0) {
             ccnd_msg(h, "protocol error on face %u, on fd %d", source->faceid, source->recv_fd);
-            shutdown_client_fd(h, fd);
+           // shutdown_client_fd(h, fd);
             return;
         }
         if (msgstart < face->inbuf->length && msgstart > 0) {
