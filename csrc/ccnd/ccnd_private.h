@@ -447,7 +447,10 @@ struct ccn_pcap_handle_list {
 	struct ccn_pcap_handle_list *next;
 };
 
-
+struct buf{
+	char* buf;
+	int len;
+};
 
 /* create and destroy procs for separately allocated meters */
 struct ccnd_meter *ccnd_meter_create(struct ccnd_handle *h, const char *what);

@@ -5081,6 +5081,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 	ssize_t tmpres;
     unsigned char *buf;
 	unsigned char *tmpbuf;
+	struct buf *strbuf = (struct buf *)malloc(sizeof(struct buf));
     struct ccn_skeleton_decoder *d;
     struct sockaddr_storage sstor;
     socklen_t addrlen = sizeof(sstor);
@@ -5113,12 +5114,14 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
     if (face->inbuf->length == 0)
         memset(d, 0, sizeof(*d));
     buf = ccn_charbuf_reserve(face->inbuf, 8800);
+	strbuf->buf = buf;
     memset(&sstor, 0, sizeof(sstor));
 	int rawaddrlen = sizeof(struct sockaddr_ll);
 	if((face->flags & CCN_FACE_UDL) == CCN_FACE_UDL){
 		ccnd_msg(h,"process input udl");
 		//tmpbuf = pcap_next(face->pcap_handle, &header);
-		pcap_dispatch(face->pcap_handle, 1, pcap_callback, buf);
+		pcap_dispatch(face->pcap_handle, 1, pcap_callback, strbuf);
+		res = strbuf->len;
 		//ccnd_msg(h,"process input udl complete header.len %d", header.len);
 		//14 is the length of MAC header
 		/*memcpy(buf, tmpbuf+14, header.len-14);
@@ -5137,8 +5140,8 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		}*/
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		//ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
-		ccnd_msg(h, "pcap face %u fd %d :%s", face->faceid, face->recv_fd, buf);
+		ccnd_msg(h, "pcap face %u fd %d :%s ,len: %d", face->faceid, face->recv_fd, buf, res);
+		//ccnd_msg(h, "pcap face %u fd %d :%s", face->faceid, face->recv_fd, buf);
 		//h->fds[fds_index].revents = h->fds[fds_index].revents - POLLIN;
 	}
     else{
@@ -6423,11 +6426,11 @@ void insert_pcap_handle_list(struct ccn_pcap_handle_list *plist, pcap_t *pcap_ha
 }
 
 void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
-	memcpy(args, packet+14, header->len-14);
-	int res = header->len-14;
-	if (res == 46){
-		while (args[res-1]==0x00) res--;
-			res += 2;
+	memcpy(((struct buf*)args)->buf, packet+14, header->len-14);
+	int ((struct buf*)args)->len = header->len-14;
+	if ((struct buf*)args)->len == 46){
+		while (args[(struct buf*)args)->len-1]==0x00) (struct buf*)args)->len--;
+			(struct buf*)args)->len += 2;
 	}
 }
 
