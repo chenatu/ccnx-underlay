@@ -1045,7 +1045,7 @@ consume_interest(struct ccnd_handle *h, struct interest_entry *ie)
     hashtb_start(h->interest_tab, e);
     res = hashtb_seek(e, ie->interest_msg, ie->size - 1, 1);
     if (res != HT_OLD_ENTRY){
-		ccnd(h,"HT_OLD_ENTRY abort");
+		ccnd_msg(h,"HT_OLD_ENTRY abort");
         abort();
     }
     hashtb_delete(e);
