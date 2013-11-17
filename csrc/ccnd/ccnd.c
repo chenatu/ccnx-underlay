@@ -5879,7 +5879,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					if(pcap_setnonblock(handle, 1, errbuf) < 0)
 							ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
 					
-					ccnd_msg(h, "pcap fd: %d", handle->fd);
+					ccnd_msg(h, "pcap fd: %d", handle->selectable_fd);
 					/*
 					if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
 						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
