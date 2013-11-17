@@ -5428,7 +5428,8 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
 		memcpy((buffer+2+(2*6)), data, size	);
 		ccnd_msg(h,"---4---");
-		res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
+		//res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
+		res = pcap_inject(face->handle, buffer, bufferlen);
 		ccnd_msg(h, "ccnd_send udl buffer: %s, size: %d, res: %d", buffer, bufferlen, res);
 	}
     if ((face->flags & CCN_FACE_DGRAM) == 0 && (face->flags & CCN_FACE_UDL) == 0)
@@ -5826,7 +5827,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 		struct ccn_underlay_sock_list * usock_list = h->usock_list;
 		while(usock_list->next != NULL){
 			usock_list = usock_list->next;
-			struct sockaddr_ll* raw_addr;
+			/*struct sockaddr_ll* raw_addr;
 			raw_addr = calloc(1, sizeof(struct sockaddr_ll));
 			raw_fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 			if(raw_fd != -1){
@@ -5848,38 +5849,61 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 		        	close(raw_fd);
 		        	return(0);
 		        }
-				usock_list->usock.sock = raw_fd;
+				usock_list->usock.sock = raw_fd;*/
+
+
+				char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
+				pcap_t *handle;				/* packet capture handle */
+				char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
+				struct bpf_program fp;			/* compiled filter program (expression) */
+				handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
+				if (handle == NULL) {
+					ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
+				}
+				if(pcap_setdirection(handle, PCAP_D_IN)==-1){
+					ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
+				}					
+				if(pcap_setnonblock(handle, 1, errbuf) < 0)
+						ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
+					
+				raw_fd = pcap_get_selectable_fd();
+
+				insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
+				if (pcap_datalink(handle) != DLT_EN10MB) {
+					ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
+				}				
 				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
+				
 				struct hashtb_enumerator ee;
 				struct hashtb_enumerator *e = &ee;
 				struct face *face = NULL;
 				unsigned char *addrspace;
 				hashtb_start(h->faces_by_fd, e);
-				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), sizeof(struct sockaddr_ll)) == HT_NEW_ENTRY) {
+				if (hashtb_seek(e, &raw_fd, sizeof(raw_fd), 0) == HT_NEW_ENTRY) {
 					face = e->data;
 	        		face->recv_fd = raw_fd;
 					face->sendface = CCN_NOFACEID;
-					face->addrlen = e->extsize;
-					addrspace = ((unsigned char *)e->key) + e->keysize;
-					face->raw_addr = (struct sockaddr_ll *)addrspace;
-					memcpy(addrspace, (struct sockaddr_ll *)raw_addr, e->extsize);
+					//face->addrlen = e->extsize;
+					//addrspace = ((unsigned char *)e->key) + e->keysize;
+					//face->raw_addr = (struct sockaddr_ll *)addrspace;
+					//memcpy(addrspace, (struct sockaddr_ll *)raw_addr, e->extsize);
 					face->eth = usock_list->usock.eth;
 					//initialzing work of pcap for receiving raw socket
-					char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
-					pcap_t *handle;				/* packet capture handle */
-					char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
-					struct bpf_program fp;			/* compiled filter program (expression) */
-					handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
-					if (handle == NULL) {
-						ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
-					}
-					if(pcap_setdirection(handle, PCAP_D_IN)==-1){
-						ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
-					}					
-					if(pcap_setnonblock(handle, 1, errbuf) < 0)
-							ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
+					//char errbuf[PCAP_ERRBUF_SIZE];		/* error buffer */
+					//pcap_t *handle;				/* packet capture handle */
+					//char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
+					//struct bpf_program fp;			/* compiled filter program (expression) */
+					//handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
+					//if (handle == NULL) {
+					//	ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
+					//}
+					//if(pcap_setdirection(handle, PCAP_D_IN)==-1){
+					//	ccnd_msg(h, "Couldn't set direction in on device %s: %s", usock_list->usock.eth, pcap_geterr(handle));
+					//}					
+					//if(pcap_setnonblock(handle, 1, errbuf) < 0)
+					//		ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
 					
-					ccnd_msg(h, "pcap fd: %d", handle->selectable_fd);
+					//ccnd_msg(h, "pcap fd: %d", handle->selectable_fd);*/
 					/*
 					if (pcap_compile(handle, &fp, filter_exp, 0, NULL) == -1) {
 						ccnd_msg(h, "Couldn't parse filter %s: %s", filter_exp, pcap_geterr(handle));
@@ -5889,10 +5913,10 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					if (pcap_setfilter(handle, NULL) == -1) {
 						ccnd_msg(stderr, "Couldn't install filter %s: %s",filter_exp, pcap_geterr(handle));
 					}*/
-					insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
-					if (pcap_datalink(handle) != DLT_EN10MB) {
-						ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
-					}
+					//insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
+					//if (pcap_datalink(handle) != DLT_EN10MB) {
+						//ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
+					//}
 
 					face->pcap_handle = handle;
 					init_face_flags(h, face, setflags);			
@@ -5906,7 +5930,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					hashtb_end(e);
 				}
 				if (face == NULL) {
-	            	close(fd);
+	            	close(raw_fd);
 	            	return(0);
 	            }
 				h->underlay_faceid = face->faceid;
