@@ -1044,8 +1044,10 @@ consume_interest(struct ccnd_handle *h, struct interest_entry *ie)
     
     hashtb_start(h->interest_tab, e);
     res = hashtb_seek(e, ie->interest_msg, ie->size - 1, 1);
-    if (res != HT_OLD_ENTRY)
+    if (res != HT_OLD_ENTRY){
+		ccnd(h,"HT_OLD_ENTRY abort");
         abort();
+    }
     hashtb_delete(e);
     hashtb_end(e);
 }    
@@ -3859,7 +3861,7 @@ do_propagate(struct ccn_schedule *sched,
     }
     /* Determine when we need to run again */
     if (mn == 0){
-		ccnd_msg(h, "abort");
+		ccnd_msg(h, "mn == 0 abort");
 		abort();
     }
     next_delay = mn * (1000000 / WTHZ);
