@@ -2933,7 +2933,7 @@ Underlay:
 	struct hashtb_enumerator *e = &ee;
 	newface = NULL;
 	unsigned char *addrspace;
-	hashtb_start(h->dgram_faces, e);
+	hashtb_start(h->faces_by_fd, e);
 	setflags |=  CCN_FACE_UDL;
 	res = hashtb_seek(e, face->recv_fd, sizeof(int), 0);
 	ccnd_msg(h, "hashtb_seek res: %d", res);
