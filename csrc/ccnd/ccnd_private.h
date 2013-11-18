@@ -249,7 +249,6 @@ struct face {
     unsigned short adjstate;    /**< state of adjacency negotiotiation */
 	char* eth;
 	pcap_t* pcap_handle;
-	int pcap_len;
 };
 
 /** face flags */

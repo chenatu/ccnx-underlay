@@ -2935,17 +2935,15 @@ Underlay:
 	unsigned char *addrspace;
 	hashtb_start(h->dgram_faces, e);
 	setflags |=  CCN_FACE_UDL;
-	pcap_t pcap_len;
-	res = hashtb_seek(e, face->pcap_handle, sizeof(pcap_len), 0);
+	res = hashtb_seek(e, face->recv_fd, sizeof(int), 0);
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
 		if (newface->pcap_handle == NULL) {
-            newface->pcap_handle = e->key;
-            newface->pcap_len = e->keysize;
             newface->recv_fd = face->recv_fd;
             newface->sendface = face->faceid;
 			newface->eth = ueth;
+			newface->pcap_handle = face->pcap_handle;
             init_face_flags(h, newface, setflags);
             newface->flags |= CCN_FACE_GG;
             res = enroll_face(h, newface);
