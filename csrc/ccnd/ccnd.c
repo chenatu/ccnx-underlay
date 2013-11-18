@@ -2918,6 +2918,7 @@ ccnd_req_newface(struct ccnd_handle *h,
 
 Underlay:
 	// Initialize the raw socket
+	ccnd_msg(h, "req an underlay new face");
 	ueth = face_instance->descr.address;
 	while(ufaceid_list->next != NULL){
 		ufaceid_list = ufaceid_list->next;
@@ -2934,13 +2935,13 @@ Underlay:
 	unsigned char *addrspace;
 	hashtb_start(h->dgram_faces, e);
 	setflags |=  CCN_FACE_UDL;
-	res = hashtb_seek(e, (struct sockaddr*)face->raw_addr, rawsocklen, 0);
+	res = hashtb_seek(e, face->pcap_handle, sizeof(pcap_t), 0);
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
-		if (newface->raw_addr== NULL) {
-            newface->raw_addr = e->key;
-            newface->addrlen = e->keysize;
+		if (newface->pcap_handle == NULL) {
+            newface->pcap_handle = e->key;
+            newface->pcap_len = e->keysize;
             newface->recv_fd = face->recv_fd;
             newface->sendface = face->faceid;
 			newface->eth = ueth;
@@ -5930,6 +5931,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					//}
 
 					face->pcap_handle = handle;
+					face->pcap_len = sizeof(pcap_t);
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
