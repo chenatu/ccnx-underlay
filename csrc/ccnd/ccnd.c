@@ -2936,6 +2936,7 @@ Underlay:
 	hashtb_start(h->dgram_faces, e);
 	setflags |=  CCN_FACE_UDL;
 	res = hashtb_seek(e, face->recv_fd, sizeof(int), 0);
+	ccnd_msg(h, "hashtb_seek res: %d", res);
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
