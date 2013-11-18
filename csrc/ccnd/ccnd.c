@@ -2935,7 +2935,8 @@ Underlay:
 	unsigned char *addrspace;
 	hashtb_start(h->dgram_faces, e);
 	setflags |=  CCN_FACE_UDL;
-	res = hashtb_seek(e, face->pcap_handle, sizeof(pcap_t), 0);
+	pcap_t pcap_len;
+	res = hashtb_seek(e, face->pcap_handle, sizeof(pcap_len), 0);
 	if (res >= 0) {
 		newface = e->data;
 		newface->recvcount++;
