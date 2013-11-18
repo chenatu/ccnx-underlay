@@ -5931,7 +5931,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					//}
 
 					face->pcap_handle = handle;
-					face->pcap_len = sizeof(pcap_t);
+					face->pcap_len = sizeof(struct pcap);
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
