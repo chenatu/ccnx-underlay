@@ -5856,7 +5856,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				pcap_t *handle;				/* packet capture handle */
 				char filter_exp[] = "inbound";		/* filter expression, I think NULL means capturing all the packets*/
 				struct bpf_program fp;			/* compiled filter program (expression) */
-				handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 0, errbuf);
+				handle = pcap_open_live(usock_list->usock.eth, SNAP_LEN, 1, 1000, errbuf);
 				if (handle == NULL) {
 					ccnd_msg(h, "Couldn't open device %s: %s", usock_list->usock.eth, errbuf);
 				}
@@ -5870,6 +5870,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					ccnd_msg(h, "get selectable fd failed");
 					return(0);
 				}
+				ccnd_msg(h, "pcap_get_selectable_fd: %d", raw_fd);
 
 				
 				usock_list->usock.sock = raw_fd;
