@@ -5459,7 +5459,7 @@ do_deferred_write(struct ccnd_handle *h, int fd)
 			if(face->flags && CCN_FACE_UDL != 0){
 				int buffer[14 + sendlen];
 				memcpy(buffer, face->bufferhead, 14);
-				memcpy(buffer+14, fface->outbuf->buf + face->outbufindex, sendlen);
+				memcpy(buffer+14, face->outbuf->buf + face->outbufindex, sendlen);
 				res = pcap_inject(face->pcap_handle, buffer, 14+sendlen);
 			}else{
             	res = send(fd, face->outbuf->buf + face->outbufindex, sendlen, 0);
