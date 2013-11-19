@@ -5456,8 +5456,15 @@ do_deferred_write(struct ccnd_handle *h, int fd)
     if (face->outbuf != NULL) {
         ssize_t sendlen = face->outbuf->length - face->outbufindex;
         if (sendlen > 0) {
-            res = send(fd, face->outbuf->buf + face->outbufindex, sendlen, 0);
-            if (res == -1) {
+			if(face->flags && CCN_FACE_UDL != 0){
+				int buffer[14 + sendlen];
+				memcpy(buffer, face->bufferhead, 14);
+				memcpy(buffer+14, fface->outbuf->buf + face->outbufindex, sendlen);
+				res = pcap_inject(face->pcap_handle, buffer, 14+sendlen);
+			}else{
+            	res = send(fd, face->outbuf->buf + face->outbufindex, sendlen, 0);
+			}
+			if (res == -1) {
                 if (errno == EPIPE) {
                     face->flags |= CCN_FACE_NOSEND;
                     face->outbufindex = 0;
