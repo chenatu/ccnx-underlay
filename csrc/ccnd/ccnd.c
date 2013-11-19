@@ -5876,8 +5876,8 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				}					
 				if(pcap_setnonblock(handle, 1, errbuf) < 0)
 						ccnd_msg(h, "Couldn't set nonblock %s: %s", usock_list->usock.eth, errbuf);
-					
-				if(raw_fd = pcap_get_selectable_fd(handle) == -1){
+				raw_fd = pcap_get_selectable_fd(handle);				
+				if(raw_fd == -1){
 					ccnd_msg(h, "get selectable fd failed");
 					return(0);
 				}
