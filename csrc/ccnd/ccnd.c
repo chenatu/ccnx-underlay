@@ -3561,7 +3561,6 @@ static struct pit_face_item *
 send_interest(struct ccnd_handle *h, struct interest_entry *ie,
               struct pit_face_item *x, struct pit_face_item *p)
 {
-	ccnd_msg(h, "prepare send_interest from: faceid %d, to faceid %d", x->faceid, p->faceid);
     struct face *face = NULL;
     struct ccn_charbuf *c = h->send_interest_scratch;
     const intmax_t default_life = CCN_INTEREST_LIFETIME_SEC << 12;
@@ -5410,21 +5409,22 @@ ccnd_send(struct ccnd_handle *h,
         return;
     }
 	if ((face->flags & CCN_FACE_UDL) != 0 ){
-		ccnd_msg(h,"(face->flags & CCN_FACE_UDL) != 0 eth: %s, ethid: %d", face->eth, face->raw_addr->sll_ifindex);
+		ccnd_msg(h,"(face->flags & CCN_FACE_UDL) != 0 eth: %s", face->eth);
 		unsigned char sourceMAC[ETH_ALEN];
 		//get the name of eth from ethid
 		struct ifreq ifr;
 		memset(&ifr, 0, sizeof(ifr));
-    	ifr.ifr_ifindex = face->raw_addr->sll_ifindex;
-		int res = ioctl(face->recv_fd, SIOCGIFNAME, &ifr);
-    	if (res == -1)
+    	//ifr.ifr_ifindex = face->raw_addr->sll_ifindex;
+		ccnd_msg(h,"---1---, face->recv_fd: %d", face->recv_fd);
+		//int res = ioctl(face->recv_fd, SIOCGIFNAME, &ifr);
+    	/*if (res == -1)
     	{
 			ccnd_msg(h,"look up name failed res == %d", res);
 			return;
-    	}
-		printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
-
-		lookup_SourceMAC(face->recv_fd, ifr.ifr_name, sourceMAC);
+    	}*/
+		//printf("get_iface_name: eth %s, ethid %d\n", ifr.ifr_name, ifr.ifr_ifindex);
+		ccnd_msg(h,"---2---");
+		lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
 		ccnd_msg(h, "soureMAC %s", sourceMAC);
 		//construct the ethernet frame
 		ccnd_msg(h, "before MAC size: %d data:%s", size, data);
