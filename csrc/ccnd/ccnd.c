@@ -5456,7 +5456,7 @@ do_deferred_write(struct ccnd_handle *h, int fd)
     if (face->outbuf != NULL) {
         ssize_t sendlen = face->outbuf->length - face->outbufindex;
         if (sendlen > 0) {
-			if(face->flags && CCN_FACE_UDL != 0){
+			if((face->flags & CCN_FACE_UDL) != 0){
 				int buffer[14 + sendlen];
 				memcpy(buffer, face->bufferhead, 14);
 				memcpy(buffer+14, face->outbuf->buf + face->outbufindex, sendlen);
