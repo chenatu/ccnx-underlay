@@ -424,6 +424,7 @@ struct ccn_forwarding {
  */
 struct ccn_underlay_sock {
 	char* eth;
+	char* bufferhead;	//DestMAC SourceMAC and Type
 	int sock;
 };
 
