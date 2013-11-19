@@ -5879,7 +5879,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					face->bufferhead = buffer;
 
 					face->pcap_handle = handle;
-					face->eth = usock_list->usock.eth
+					face->eth = usock_list->usock.eth;
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
