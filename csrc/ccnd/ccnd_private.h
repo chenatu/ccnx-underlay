@@ -249,6 +249,7 @@ struct face {
     unsigned short adjstate;    /**< state of adjacency negotiotiation */
 	char* eth;
 	pcap_t* pcap_handle;
+	char* bufferhead;	/**< bufferhead include MAC address and protocol type*/
 };
 
 /** face flags */
