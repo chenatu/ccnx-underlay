@@ -5390,6 +5390,7 @@ ccnd_send(struct ccnd_handle *h,
           struct face *face,
           const void *data, size_t size)
 {
+	ccnd_msg(h, "prepare ccnd_send");
     ssize_t res;
     int fd;
     int bcast = 0;
@@ -5881,8 +5882,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					ccnd_msg(h, "get selectable fd failed");
 					return(0);
 				}
-				ccnd_msg(h, "pcap_get_selectable_fd: %d", raw_fd);
-
 				
 				usock_list->usock.sock = raw_fd;
 				insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
