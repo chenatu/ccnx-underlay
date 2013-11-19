@@ -3467,7 +3467,11 @@ get_outbound_faces(struct ccnd_handle *h,
         }
     }
     if (npe->forward_to == NULL || npe->forward_to->n == 0){
-		ccnd_msg(h, "npe->forward_to == NULL || npe->forward_to->n == 0");
+		if(npe->forward_to == NULL){
+			ccnd_msg(h, "npe->forward_to == NULL");
+		} else{
+			ccnd_msg(h, "npe->forward_to->n == 0");
+		}
         return(x);
     }
     if ((npe->flags & CCN_FORW_LOCAL) != 0)
@@ -3557,6 +3561,7 @@ static struct pit_face_item *
 send_interest(struct ccnd_handle *h, struct interest_entry *ie,
               struct pit_face_item *x, struct pit_face_item *p)
 {
+	ccnd_msg(h, "prepare send_interest from: faceid %d, to faceid %d", x->faceid, p->faceid);
     struct face *face = NULL;
     struct ccn_charbuf *c = h->send_interest_scratch;
     const intmax_t default_life = CCN_INTEREST_LIFETIME_SEC << 12;
@@ -3767,7 +3772,7 @@ do_propagate(struct ccn_schedule *sched,
     unsigned life;
     unsigned mn;
     unsigned rem;
-    
+    ccnd_msg(h,"do_propagate");
     if (ie->ev == ev)
         ie->ev = NULL;
     if (flags & CCN_SCHEDULE_CANCEL)
