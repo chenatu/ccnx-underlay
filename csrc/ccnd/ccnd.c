@@ -6100,7 +6100,7 @@ ccnd_create(const char *progname, ccnd_logger logger, void *loggerdata, int argc
 			case 'u':
 				h->underlay_eth = optarg;
 				char* bufferhead = (char*)malloc(14);
-				insert_underlay_sock_list(h->usock_list,optarg, bufferhead,-1);
+				insert_underlay_sock_list(h->usock_list,optarg,bufferhead,-1);
 				h->isunderlay = 1;
 				break;
 			case 'h':
