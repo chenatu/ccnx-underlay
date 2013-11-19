@@ -5839,7 +5839,7 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				//get the name of eth from ethid
 				struct ifreq ifr;
 				memset(&ifr, 0, sizeof(ifr));
-				lookup_SourceMAC(face->recv_fd, face->eth, sourceMAC);
+				lookup_SourceMAC(face->recv_fd, usock_list->usock.eth, sourceMAC);
 				//construct the ethernet frame
 				size_t bufferlen = 2 + 2*6;
 				char buffer[bufferlen];
