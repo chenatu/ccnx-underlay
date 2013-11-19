@@ -5834,22 +5834,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				}				
 				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
 
-
-				unsigned char sourceMAC[ETH_ALEN];
-				//get the name of eth from ethid
-				struct ifreq ifr;
-				memset(&ifr, 0, sizeof(ifr));
-				lookup_SourceMAC(face->recv_fd, usock_list->usock.eth, sourceMAC);
-				//construct the ethernet frame
-				size_t bufferlen = 2 + 2*6;
-				char buffer[bufferlen];
-				memset(buffer, 0, bufferlen);
-				//This public MAC address is for broadcast
-				unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-				memcpy(buffer, broaddest, 6);
-				memcpy((buffer+6), sourceMAC, 6);
-				short int etherTypeT = htons(ETH_P_ALL);
-				memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
 				
 				struct hashtb_enumerator ee;
 				struct hashtb_enumerator *e = &ee;
@@ -5876,8 +5860,25 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					memcpy((buffer+6), sourceMAC, 6);
 					short int etherTypeT = htons(ETH_P_ALL);
 					memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
-					face->bufferhead = buffer;
 
+					
+					unsigned char sourceMAC[ETH_ALEN];
+					//get the name of eth from ethid
+					struct ifreq ifr;
+					memset(&ifr, 0, sizeof(ifr));
+					lookup_SourceMAC(face->recv_fd, usock_list->usock.eth, sourceMAC);
+					//construct the ethernet frame
+					size_t bufferlen = 2 + 2*6;
+					char buffer[bufferlen];
+					memset(buffer, 0, bufferlen);
+					//This public MAC address is for broadcast
+					unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+					memcpy(buffer, broaddest, 6);
+					memcpy((buffer+6), sourceMAC, 6);
+					short int etherTypeT = htons(ETH_P_ALL);
+					memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
+
+					face->bufferhead = buffer;
 					face->pcap_handle = handle;
 					face->eth = usock_list->usock.eth;
 					init_face_flags(h, face, setflags);			
