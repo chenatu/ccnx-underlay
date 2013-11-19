@@ -5454,8 +5454,8 @@ do_deferred_write(struct ccnd_handle *h, int fd)
     if (face == NULL)
         return;
     if (face->outbuf != NULL) {
-		ccnd_msg(h, "face->outbuf != NULL fd:%d face->flags:%x sendlen%d", fd, face->flags,sendlen);
         ssize_t sendlen = face->outbuf->length - face->outbufindex;
+		ccnd_msg(h, "face->outbuf != NULL fd:%d face->flags:%x sendlen: %d", fd, face->flags,sendlen);
         if (sendlen > 0) {
 			if((face->flags & CCN_FACE_UDL) != 0){
 				ccnd_msg(h, "do_deferred_write (face->flags & CCN_FACE_UDL) != 0");
