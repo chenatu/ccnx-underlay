@@ -5387,7 +5387,9 @@ ccnd_send(struct ccnd_handle *h,
 		memcpy((buffer+2+(2*6)), data, size	);*/
 		size_t bufferlen = 2 + 2*6 + size;
 		char buffer[bufferlen];
+		memset(buffer, 0, bufferlen);
 		memcpy(buffer,face->bufferhead, 14);
+		ccnd_msg(h, "bufferhead:%x, data:%s", face->bufferhead, data);
 		memcpy(buffer+14, data, size);
 
 		//res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
