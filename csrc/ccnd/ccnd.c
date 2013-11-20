@@ -5120,7 +5120,7 @@ process_input(struct ccnd_handle *h, int fd, int fds_index)
 		}*/
 		//ccnd_msg(h, "res is %d, tmpres is %d", res, tmpres);
 		//ccnd_msg(h, "compare result: %d, res is %d, tmpres is %d", memcmp(buf, tmpbuf, res), res, tmpres);
-		//ccnd_msg(h, "pcap face %u fd %d :%s", face->faceid, face->recv_fd, buf);
+		ccnd_msg(h, "pcap face %u fd %d :%s len: %d", face->faceid, face->recv_fd, buf, res);
 		//h->fds[fds_index].revents = h->fds[fds_index].revents - POLLIN;
 	}
     else{
@@ -5394,6 +5394,7 @@ ccnd_send(struct ccnd_handle *h,
 
 		//res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
 		res = pcap_inject(face->pcap_handle, buffer, bufferlen);
+		ccnd_msg(h, "ccnd_send: %s, size: %d, bufferhead: %s", face->bufferhead);
 		if(res > 0)
 			res = res -14;
 	}
@@ -6409,7 +6410,7 @@ void pcap_callback (u_char *args, const struct pcap_pkthdr *header, const u_char
 	((struct buf*)args)->len = header->len-14;
 	if (((struct buf*)args)->len == 46){
 		while (((struct buf*)args)->buf[((struct buf*)args)->len-1]==0x00) ((struct buf*)args)->len--;
-			((struct buf*)args)->len += 2;
+		((struct buf*)args)->len += 2;
 	}
 }
 
