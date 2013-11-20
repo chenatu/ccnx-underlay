@@ -5394,7 +5394,7 @@ ccnd_send(struct ccnd_handle *h,
 
 		//res = sendto(face->recv_fd, buffer, bufferlen, 0, (struct sockaddr*)face->raw_addr, sizeof(struct sockaddr_ll));
 		res = pcap_inject(face->pcap_handle, buffer, bufferlen);
-		ccnd_msg(h, "ccnd_send: %s, size: %d, bufferhead: %s", face->bufferhead);
+		ccnd_msg(h, "ccnd_send: %s, size: %d, bufferhead: %s", data, size, face->bufferhead);
 		if(res > 0)
 			res = res -14;
 	}
