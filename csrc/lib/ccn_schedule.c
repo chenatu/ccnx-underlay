@@ -291,6 +291,7 @@ ccn_schedule_run_next(struct ccn_schedule *sched)
     late = sched->now - sched->heap[0].event_time;
     heap_sift(sched->heap, sched->heap_n--);
     res = (ev->action)(sched, sched->clienth, ev, 0);
+	printf("ccn_schedule_run_next\n");
     if (res <= 0) {
         free(ev);
         return;
@@ -316,6 +317,7 @@ ccn_schedule_run_next(struct ccn_schedule *sched)
 int
 ccn_schedule_run(struct ccn_schedule *sched)
 {
+	printf("ccn_schedule_run\n");
 	heapmicros ans;
     do {
         while (sched->heap_n > 0 && sched->heap[0].event_time <= sched->now)

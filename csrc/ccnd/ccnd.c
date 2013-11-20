@@ -2944,7 +2944,6 @@ Underlay:
             newface->recv_fd = face->recv_fd;
             newface->sendface = face->faceid;
 			newface->eth = ueth;
-			newface->bufferhead = face->bufferhead;
 			newface->pcap_handle = face->pcap_handle;
             init_face_flags(h, newface, setflags);
             newface->flags |= CCN_FACE_GG;
@@ -5508,18 +5507,9 @@ do_deferred_write(struct ccnd_handle *h, int fd)
         return;
     if (face->outbuf != NULL) {
         ssize_t sendlen = face->outbuf->length - face->outbufindex;
-		ccnd_msg(h, "face->outbuf != NULL fd:%d face->flags:%x sendlen: %d", fd, face->flags,sendlen);
         if (sendlen > 0) {
-			if((face->flags & CCN_FACE_UDL) != 0){
-				ccnd_msg(h, "do_deferred_write (face->flags & CCN_FACE_UDL) != 0");
-				char buffer[14 + sendlen];
-				memcpy(buffer, face->bufferhead, 14);
-				memcpy(buffer+14, face->outbuf->buf + face->outbufindex, sendlen);
-				res = pcap_inject(face->pcap_handle, buffer, 14+sendlen);
-			}else{
-            	res = send(fd, face->outbuf->buf + face->outbufindex, sendlen, 0);
-			}
-			if (res == -1) {
+            res = send(fd, face->outbuf->buf + face->outbufindex, sendlen, 0);
+            if (res == -1) {
                 if (errno == EPIPE) {
                     face->flags |= CCN_FACE_NOSEND;
                     face->outbufindex = 0;
@@ -5894,33 +5884,11 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 				}
 				
 				usock_list->usock.sock = raw_fd;
-
 				insert_pcap_handle_list(h->pcap_handle_list, handle, usock_list->usock.eth);
 				if (pcap_datalink(handle) != DLT_EN10MB) {
 					ccnd_msg(h, "%s is not an Ethernet", usock_list->usock.eth);
 				}				
 				int setflags = CCN_FACE_PASSIVE | CCN_FACE_UDL;
-<<<<<<< HEAD
-
-				unsigned char sourceMAC[ETH_ALEN];
-				//get the name of eth from ethid
-				struct ifreq ifr;
-				memset(&ifr, 0, sizeof(ifr));
-				lookup_SourceMAC(raw_fd, usock_list->usock.eth, sourceMAC);
-				//construct the ethernet frame
-				size_t bufferlen = 2 + 2*6;
-				char buffer[bufferlen];
-				memset(buffer, 0, bufferlen);
-				//This public MAC address is for broadcast
-				unsigned char broaddest[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-				memcpy(buffer, broaddest, 6);
-				memcpy((buffer+6), sourceMAC, 6);
-				short int etherTypeT = htons(ETH_P_ALL);
-				memcpy(buffer+(2*6), &(etherTypeT), sizeof(etherTypeT));
-
-				memcpy(usock_list->usock.bufferhead, buffer, 14);
-=======
->>>>>>> parent of da6e181... remove ccnd_msg and add bufferhead
 				
 				struct hashtb_enumerator ee;
 				struct hashtb_enumerator *e = &ee;
@@ -5931,14 +5899,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					face = e->data;
 	        		face->recv_fd = raw_fd;
 					face->sendface = CCN_NOFACEID;
-<<<<<<< HEAD
-
-					face->bufferhead = buffer;
-					face->pcap_handle = handle;
-					face->eth = usock_list->usock.eth;
-					face->bufferhead = usock_list->usock.bufferhead;
-
-=======
 					//face->addrlen = e->extsize;
 					//addrspace = ((unsigned char *)e->key) + e->keysize;
 					//face->raw_addr = (struct sockaddr_ll *)addrspace;
@@ -5975,7 +5935,6 @@ ccnd_listen_on_wildcards(struct ccnd_handle *h)
 					//}
 
 					face->pcap_handle = handle;
->>>>>>> parent of da6e181... remove ccnd_msg and add bufferhead
 					init_face_flags(h, face, setflags);			
 					res = enroll_face(h, face);
 					if (res == -1) {
@@ -6206,8 +6165,7 @@ ccnd_create(const char *progname, ccnd_logger logger, void *loggerdata, int argc
 		switch (opt) {
 			case 'u':
 				h->underlay_eth = optarg;
-				char* bufferhead = (char*)malloc(14);
-				insert_underlay_sock_list(h->usock_list,optarg,bufferhead,-1);
+				insert_underlay_sock_list(h->usock_list,optarg,-1);
 				h->isunderlay = 1;
 				break;
 			case 'h':
@@ -6470,7 +6428,7 @@ void lookup_SourceMAC(int fd, char* eth, char* sourceMAC)
 	memcpy((void*)sourceMAC, (void*)(ifr.ifr_hwaddr.sa_data), ETH_ALEN);
 }
 
-void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,char* bufferhead, int sock)
+void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,int sock)
 {
 	struct ccn_underlay_sock_list * p = ulist;
 	while (p->next != NULL)
@@ -6478,7 +6436,6 @@ void insert_underlay_sock_list(struct ccn_underlay_sock_list *ulist,char * eth,c
 	p->next = (struct ccn_underlay_sock_list*)calloc(1,sizeof(struct ccn_underlay_sock_list));
 	p = p->next;
 	p->usock.eth = eth;
-	p->usock.bufferhead = bufferhead;
 	p->usock.sock = sock;
 	p->next=NULL;
 }
