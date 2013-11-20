@@ -423,6 +423,7 @@ struct ccn_forwarding {
  */
 struct ccn_underlay_sock {
 	char* eth;
+	char* bufferhead;	//DestMAC SourceMAC and Type
 	int sock;
 };
 
@@ -583,7 +584,7 @@ void ccnd_run(struct ccnd_handle *h);
 void ccnd_destroy(struct ccnd_handle **);
 extern const char *ccnd_usage_message;
 
-void insert_underlay_sock_list(struct ccn_underlay_sock_list *, char* , int );
+void insert_underlay_sock_list(struct ccn_underlay_sock_list *, char* , char*, int );
 void print_underlay_sock_list(struct ccn_underlay_sock_list *);
 void insert_underlay_faceid_list(struct ccn_underlay_faceid_list *, int , char* );
 void insert_pcap_handle_list(struct ccn_pcap_handle_list *, pcap_t *, char* );
