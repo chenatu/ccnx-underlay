@@ -5583,12 +5583,9 @@ ccnd_run(struct ccnd_handle *h)
 		            	timeout_ms = 1;*/
                     continue;
                 }
-                /*if (h->fds[i].revents & (POLLOUT))
+                if (h->fds[i].revents & (POLLOUT))
                     do_deferred_write(h, h->fds[i].fd);
                 else if (h->fds[i].revents & (POLLIN)){ 
-                    process_input(h, h->fds[i].fd, i);
-                }*/
-				if (h->fds[i].revents & (POLLIN)){ 
                     process_input(h, h->fds[i].fd, i);
                 }
 				//Change the schedule order
