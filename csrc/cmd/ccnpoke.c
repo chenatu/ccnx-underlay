@@ -263,7 +263,6 @@ main(int argc, char **argv)
         read_res = 0;
         status = 1;
     }
-    printf("Read data complete\n");
     /* Tack on the version component if requested */
     if (versioned) {
         res = ccn_create_version(ccn, name, CCN_V_REPLACE | CCN_V_NOW | CCN_V_HIGH, 0, 0);
@@ -373,7 +372,6 @@ main(int argc, char **argv)
     else {
         in_interest.data = temp;
         /* Set up a handler for interests */
-		printf(" Set up a handler for interests\n");
         res = ccn_set_interest_filter(ccn, pname, &in_interest);
         if (res < 0) {
             fprintf(stderr, "Failed to register interest (res == %d)\n", res);
