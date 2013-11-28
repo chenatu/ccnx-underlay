@@ -489,10 +489,10 @@ r_init_create(const char *progname, ccnr_logger logger, void *loggerdata, const 
 	while ((opt = getopt(argc, argv, "d:")) != -1) {
 		switch (opt) {
 			case 'd':
-				int i = atoi(optarg);
-				if(i == CCNR_DIRECT)
+				int ifd = atoi(optarg);
+				if(ifd== CCNR_DIRECT)
 					h->direct = CCNR_DIRECT;
-				else if (i == CCNR_MMAP)
+				else if (ifd== CCNR_MMAP)
 					h->direct = CCNR_MMAP;
 				else
 					h->direct = CCNR_INDIRECT;
