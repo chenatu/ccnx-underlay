@@ -128,10 +128,10 @@ main(int argc, char **argv)
 {
     int s;
     
-    if (argc > 1) {
+    /*if (argc > 1) {
         fprintf(stderr, "%s", ccnr_usage_message);
         exit(1);
-    }
+    }*/
     signal(SIGPIPE, SIG_IGN);
     global_h = r_init_create(argv[0], stdiologger, stderr, argc, argv);
     if (global_h == NULL)
