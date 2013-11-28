@@ -31,6 +31,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 
 #include <ccn/ccn_private.h>

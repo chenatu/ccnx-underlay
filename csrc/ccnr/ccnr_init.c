@@ -485,8 +485,8 @@ r_init_create(const char *progname, ccnr_logger logger, void *loggerdata, const 
     h->logpid = (int)getpid();
     h->progname = progname;
     h->debug = -1;
-
-	while ((opt = getopt(argc, argv, "d")) != -1) {
+	int opt;
+	while ((opt = getopt(argc, argv, "d:")) != -1) {
 		switch (opt) {
 			case 'd':
 				int i = atoi(optarg);
