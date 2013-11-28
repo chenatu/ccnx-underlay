@@ -465,7 +465,7 @@ ccnr_parsed_policy_destroy(struct ccnr_parsed_policy **ppp)
  * @param loggerdata - data to pass to logger function
  */
 PUBLIC struct ccnr_handle *
-r_init_create(const char *progname, ccnr_logger logger, void *loggerdata)
+r_init_create(const char *progname, ccnr_logger logger, void *loggerdata, const int argc , const char **argv)
 {
     char *sockname = NULL;
     const char *portstr = NULL;
@@ -485,6 +485,24 @@ r_init_create(const char *progname, ccnr_logger logger, void *loggerdata)
     h->logpid = (int)getpid();
     h->progname = progname;
     h->debug = -1;
+
+	while ((opt = getopt(argc, argv, "d")) != -1) {
+		switch (opt) {
+			case 'd':
+				int i = atoi(optarg);
+				if(i == CCNR_DIRECT)
+					h->direct = CCNR_DIRECT;
+				else if (i == CCNR_MMAP)
+					h->direct = CCNR_MMAP;
+				else
+					h->direct = CCNR_INDIRECT;
+				break;
+			default:
+				 break;
+		}
+	}
+
+	
     config = r_init_read_config(h);
     if (config == NULL)
         goto Bail;

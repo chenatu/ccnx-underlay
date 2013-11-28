@@ -30,6 +30,8 @@
 #include <stdint.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <stdlib.h>
+
 
 #include <ccn/ccn_private.h>
 #include <ccn/coding.h>
@@ -165,6 +167,14 @@ typedef int (*ccnr_logger)(void *loggerdata, const char *format, va_list ap);
 #define CCNR_MAX_ENUM 64
 
 /**
+ * The method for opening the file.
+ */
+#define CCNR_INDIRECT 0
+#define CCNR_DIRECT 1
+#define CCNR_MMAP 2
+
+
+/**
  * We pass this handle almost everywhere within ccnr
  */
 struct ccnr_handle {
@@ -269,6 +279,7 @@ struct ccnr_handle {
     ccnr_accession active_enum[CCNR_MAX_ENUM]; /**< active sync enumerations */
     
     const char *directory;           /**< the repository directory */
+	int direct; /**< indirect direct or mmap */
 };
 
 struct content_queue {
@@ -477,7 +488,7 @@ struct enum_state {
 
 #define PUBLIC
 
-struct ccnr_handle *r_init_create(const char *, ccnr_logger, void *);
+struct ccnr_handle *r_init_create(const char *, ccnr_logger, void *, const int argc, const char **);
 void r_init_run(struct ccnr_handle *h);
 void r_init_destroy(struct ccnr_handle **);
 

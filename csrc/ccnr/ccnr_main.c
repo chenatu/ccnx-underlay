@@ -133,7 +133,7 @@ main(int argc, char **argv)
         exit(1);
     }
     signal(SIGPIPE, SIG_IGN);
-    global_h = r_init_create(argv[0], stdiologger, stderr);
+    global_h = r_init_create(argv[0], stdiologger, stderr, argc, argv);
     if (global_h == NULL)
         exit(1);
     signal(SIGINT, &handle_signal);
