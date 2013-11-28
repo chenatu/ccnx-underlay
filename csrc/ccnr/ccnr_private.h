@@ -24,8 +24,6 @@
 #ifndef CCNR_PRIVATE_DEFINED
 #define CCNR_PRIVATE_DEFINED
 
-#define _GNU_SOURCE
-
 #include <poll.h>
 #include <stdarg.h>
 #include <stddef.h>
