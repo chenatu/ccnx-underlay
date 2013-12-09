@@ -34,6 +34,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/mman.h>
+
 
 #include <ccn/ccn_private.h>
 #include <ccn/coding.h>
@@ -282,6 +284,8 @@ struct ccnr_handle {
     
     const char *directory;           /**< the repository directory */
 	int direct; /**< indirect direct or mmap */
+	struct stat sb;	/**< status for ccnr file */
+	void *p;	/**< mmap cache for ccnr file */
 };
 
 struct content_queue {

@@ -283,7 +283,13 @@ r_io_open_repo_data_file(struct ccnr_handle *h, const char *name, int output)
 		fd = open(ccn_charbuf_as_string(temp), output ? (O_CREAT | O_WRONLY | O_APPEND) : (O_RDONLY|O_DIRECT), 0666);
 		ccnr_msg(h, "open directly");
 	}
-	else
+	if(h->direct == CCNR_MMAP){
+		fd = open(ccn_charbuf_as_string(temp), output ? (O_CREAT | O_WRONLY | O_APPEND) : O_RDONLY, 0666);
+		if (fstat (fd, &(h->sb)) == -1) {
+			ccnr_msg(h, "fstat error");
+        }
+		h->p = mmap (0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	} else
 		fd = open(ccn_charbuf_as_string(temp), output ? (O_CREAT | O_WRONLY | O_APPEND) : O_RDONLY, 0666);
     if (fd == -1) {
         if (CCNSHOULDLOG(h, sdf, CCNL_FINE))

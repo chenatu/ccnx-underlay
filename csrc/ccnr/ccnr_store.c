@@ -183,7 +183,12 @@ r_store_content_read(struct ccnr_handle *h, struct content_entry *content)
             ccnr_msg(h, "r_store_content_read %u expected %d bytes, but got %d",
                      fd, (int)content->size, (int)rres);
     } else {
-        rres = pread(fd, buf, 8800, offset); // XXX - should be symbolic
+    	if(h->direct == CCNR_MMAP){
+			memcpy(buf, h->p+offset, 8800);
+			rres = 1;
+		} else{
+        	rres = pread(fd, buf, 8800, offset); // XXX - should be symbolic
+		}
         if (rres == -1) {
             ccnr_msg(h, "r_store_content_read %u :%s (errno = %d)",
                      fd, strerror(errno), errno);
