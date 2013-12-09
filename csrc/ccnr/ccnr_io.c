@@ -288,7 +288,7 @@ r_io_open_repo_data_file(struct ccnr_handle *h, const char *name, int output)
 		if (fstat (fd, &(h->sb)) == -1) {
 			ccnr_msg(h, "fstat error");
         }
-		h->p = mmap (0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+		h->p = mmap (0, h->sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
 	} else
 		fd = open(ccn_charbuf_as_string(temp), output ? (O_CREAT | O_WRONLY | O_APPEND) : O_RDONLY, 0666);
     if (fd == -1) {
