@@ -170,6 +170,7 @@ r_store_content_read(struct ccnr_handle *h, struct content_entry *content)
         goto Bail;
     if (content->size > 0) {
         rres = pread(fd, cob->buf, content->size, offset);
+		ccnr_msg(h, "size %d, offset: %d", content->size, offset);
         if (rres == content->size) {
             cob->length = content->size;
             content->cob = cob;
