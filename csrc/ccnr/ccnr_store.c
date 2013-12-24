@@ -189,6 +189,7 @@ r_store_content_read(struct ccnr_handle *h, struct content_entry *content)
 			rres = 1;
 		} else{
         	rres = pread(fd, buf, 8800, offset); // XXX - should be symbolic
+        	ccnr_msg(h, "size 8800, offset: %d",  offset);
 		}
         if (rres == -1) {
             ccnr_msg(h, "r_store_content_read %u :%s (errno = %d)",
