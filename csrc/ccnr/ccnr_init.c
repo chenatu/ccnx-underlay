@@ -485,6 +485,8 @@ r_init_create(const char *progname, ccnr_logger logger, void *loggerdata, const 
     h->logpid = (int)getpid();
     h->progname = progname;
     h->debug = -1;
+	h->readoffset = 0;
+	h->readsize = 0;
 	int opt;
 	int ifd;
 	while ((opt = getopt(argc, argv, "d:")) != -1) {
@@ -495,6 +497,8 @@ r_init_create(const char *progname, ccnr_logger logger, void *loggerdata, const 
 					h->direct = CCNR_DIRECT;
 				else if (ifd == CCNR_MMAP)
 					h->direct = CCNR_MMAP;
+				else if (ifd == CCNR_SIMPLE_READ)
+					h->direct = CCNR_SIMPLE_READ;
 				else
 					h->direct = CCNR_INDIRECT;
 				break;

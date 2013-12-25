@@ -176,6 +176,7 @@ typedef int (*ccnr_logger)(void *loggerdata, const char *format, va_list ap);
 #define CCNR_INDIRECT 0
 #define CCNR_DIRECT 1
 #define CCNR_MMAP 2
+#define CCNR_SIMPLE_READ 3
 
 
 /**
@@ -286,6 +287,8 @@ struct ccnr_handle {
 	int direct; /**< indirect direct or mmap */
 	struct stat sb;	/**< status for ccnr file */
 	void *p;	/**< mmap cache for ccnr file */
+	int readsize;	/**< the size of read block */
+	int readoffset;	/**< the size of read block */
 };
 
 struct content_queue {

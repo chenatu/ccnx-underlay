@@ -169,8 +169,19 @@ r_store_content_read(struct ccnr_handle *h, struct content_entry *content)
     if (cob == NULL)
         goto Bail;
     if (content->size > 0) {
-        rres = pread(fd, cob->buf, content->size, offset);
-		ccnr_msg(h, "size %d, offset: %d", content->size, offset);
+		if(h->direct == CCNR_SIMPLE_READ){
+			if(h->readoffset == offset){
+				rres = read(fd, cob->buf, content->size);
+			} else{
+				rres = pread(fd, cob->buf, content->size, offset);
+				lseek(fd, offset + rres, SEEK_SET);
+			}
+			h->readoffset = offset + rres;
+		}else{
+        	rres = pread(fd, cob->buf, content->size, offset);
+		}
+		
+		//ccnr_msg(h, "size %d, offset: %d", content->size, offset);
         if (rres == content->size) {
             cob->length = content->size;
             content->cob = cob;
